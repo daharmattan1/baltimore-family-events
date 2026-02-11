@@ -19,7 +19,10 @@ export default function SubscribePage() {
           It will look something like:
           <iframe src="https://embeds.beehiiv.com/..." ... />
         */}
-        <div className="bg-white border border-[var(--muted)]/20 rounded-xl p-8 shadow-sm">
+        <div className="relative">
+          {/* Orange accent bar at top */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-[var(--accent)] rounded-t-xl" />
+          <div className="bg-white border-2 border-[var(--accent)]/20 rounded-xl p-8 shadow-lg pt-10">
           <div className="text-center mb-6">
             <h2 className="text-xl font-semibold text-[var(--text-dark)] mb-2">
               Join the Newsletter
@@ -53,6 +56,7 @@ export default function SubscribePage() {
           <p className="text-xs text-[var(--muted)] text-center mt-4">
             No spam. Unsubscribe at any time.
           </p>
+          </div>
         </div>
       </div>
 

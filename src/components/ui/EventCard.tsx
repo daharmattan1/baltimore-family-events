@@ -19,13 +19,39 @@ function formatDate(dateStr?: string): string {
 function getCostBadgeClass(costType?: string): string {
   switch (costType) {
     case "free":
-      return "bg-green-100 text-green-800";
+      return "bg-green-500 text-white font-bold"; // Prominent green for free
     case "donation":
       return "bg-blue-100 text-blue-800";
     case "paid":
       return "bg-[var(--card)] text-[var(--text)]";
     default:
       return "bg-gray-100 text-gray-600";
+  }
+}
+
+// Get category color for left border
+function getCategoryBorderColor(eventType?: string): string {
+  switch (eventType) {
+    case "museum":
+      return "border-l-purple-500";
+    case "outdoor":
+      return "border-l-green-500";
+    case "performance":
+      return "border-l-pink-500";
+    case "sports":
+      return "border-l-blue-500";
+    case "educational":
+      return "border-l-yellow-500";
+    case "food":
+      return "border-l-orange-500";
+    case "seasonal":
+      return "border-l-red-500";
+    case "class":
+      return "border-l-indigo-500";
+    case "camp":
+      return "border-l-teal-500";
+    default:
+      return "border-l-gray-300";
   }
 }
 
@@ -81,7 +107,7 @@ export default function EventCard({ event }: EventCardProps) {
   const linkUrl = event.registration_url || event.source_url;
 
   return (
-    <div className="bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow">
+    <div className={`bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow border-l-4 ${getCategoryBorderColor(event.event_type)}`}>
       {/* Header with icon and date */}
       <div className="flex items-start justify-between mb-3">
         <span className="text-2xl" aria-hidden="true">
@@ -113,15 +139,17 @@ export default function EventCard({ event }: EventCardProps) {
 
       {/* Badges */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {/* Cost badge */}
+        {/* Cost badge - larger for free events */}
         {event.cost_type && (
           <span
-            className={`text-xs px-2 py-1 rounded-full font-medium ${getCostBadgeClass(
-              event.cost_type
-            )}`}
+            className={`rounded-full font-medium ${
+              event.cost_type === "free"
+                ? "text-sm px-3 py-1.5 uppercase"
+                : "text-xs px-2 py-1"
+            } ${getCostBadgeClass(event.cost_type)}`}
           >
             {event.cost_type === "free"
-              ? "Free"
+              ? "FREE"
               : event.cost_amount || event.cost_type}
           </span>
         )}

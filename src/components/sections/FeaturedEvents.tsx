@@ -154,19 +154,19 @@ export default function FeaturedEvents() {
                 </p>
               )}
 
-              {/* Cost badge */}
+              {/* Cost badge - larger for free events */}
               {event.cost_type && (
                 <span
-                  className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
+                  className={`inline-block rounded-full font-medium ${
                     event.cost_type === "free"
-                      ? "bg-green-100 text-green-800"
+                      ? "text-sm px-3 py-1.5 bg-green-500 text-white font-bold uppercase"
                       : event.cost_type === "donation"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-[var(--card)] text-[var(--text)]"
+                      ? "text-xs px-2 py-1 bg-blue-100 text-blue-800"
+                      : "text-xs px-2 py-1 bg-[var(--card)] text-[var(--text)]"
                   }`}
                 >
                   {event.cost_type === "free"
-                    ? "Free"
+                    ? "FREE"
                     : event.cost_amount || event.cost_type}
                 </span>
               )}

@@ -5,7 +5,16 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-[var(--primary)]/5 to-[var(--bg)] py-16 sm:py-24">
+      <section
+        className="py-16 sm:py-24"
+        style={{
+          background: `
+            radial-gradient(ellipse at 70% 20%, rgba(0, 119, 182, 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 30% 80%, rgba(232, 93, 4, 0.05) 0%, transparent 40%),
+            linear-gradient(180deg, rgba(0, 119, 182, 0.05) 0%, #FAFAFA 100%)
+          `
+        }}
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--text-dark)] mb-6">
             Find the Best Family Events in Baltimore
