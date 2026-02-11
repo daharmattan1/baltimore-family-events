@@ -27,11 +27,7 @@ function getSupabaseClient() {
     );
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-    db: {
-      schema: "baltimore" as const, // Use the baltimore schema
-    },
-  });
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
 
   return supabaseInstance;
 }
@@ -78,10 +74,12 @@ export interface EventFilters {
 }
 
 // Fetch events with optional filters
+// Note: Uses baltimore schema via .schema() method
 export async function fetchEvents(filters: EventFilters = {}) {
   const supabase = getSupabase();
 
   let query = supabase
+    .schema("baltimore")
     .from("events")
     .select("*")
     .eq("is_relevant", true)
@@ -134,10 +132,12 @@ export async function fetchEvents(filters: EventFilters = {}) {
 }
 
 // Fetch featured events for homepage
+// Note: Uses baltimore schema via .schema() method
 export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
 
   const { data, error } = await supabase
+    .schema("baltimore")
     .from("events")
     .select("*")
     .eq("is_relevant", true)
