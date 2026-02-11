@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  /* Baltimore Family Events Brand Colors */
+  --primary: #0077B6;        /* Charm City Blue - links, buttons, primary actions */
+  --accent: #E85D04;         /* Crab Orange - CTAs, highlights, hover states */
+  --text: #374151;           /* Harbor Gray - body text */
+  --text-dark: #1A1A1A;      /* Boh Black - headlines */
+  --bg: #FAFAFA;             /* Row House White - page background */
+  --card: #F5F0E8;           /* Formstone Cream - card backgrounds */
+  --muted: #9CA3AF;          /* Inner Harbor - secondary text, borders */
+
+  --background: var(--bg);
+  --foreground: var(--text);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+  --color-text-dark: var(--text-dark);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Typography defaults */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
