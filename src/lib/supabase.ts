@@ -1,10 +1,11 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 // Lazy-initialize Supabase client to avoid build-time errors
 // Supports both NEXT_PUBLIC_ prefixed vars and Vercel Supabase integration vars
-let supabaseInstance: SupabaseClient | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
-function getSupabaseClient(): SupabaseClient {
+function getSupabaseClient() {
   if (supabaseInstance) {
     return supabaseInstance;
   }
@@ -28,7 +29,7 @@ function getSupabaseClient(): SupabaseClient {
 
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     db: {
-      schema: "baltimore", // Use the baltimore schema
+      schema: "baltimore" as const, // Use the baltimore schema
     },
   });
 
