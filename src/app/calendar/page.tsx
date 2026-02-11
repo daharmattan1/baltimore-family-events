@@ -53,14 +53,68 @@ export default function CalendarPage() {
     setFilters({ eventType: "", ageRange: "", costType: "" });
   };
 
+  // Quick filter handlers
+  const handleQuickFilter = (filterType: string) => {
+    if (filterType === "free") {
+      setFilters((prev) => ({
+        ...prev,
+        costType: prev.costType === "free" ? "" : "free",
+      }));
+    } else if (filterType === "toddler") {
+      setFilters((prev) => ({
+        ...prev,
+        ageRange: prev.ageRange === "toddler" ? "" : "toddler",
+      }));
+    } else if (filterType === "outdoor") {
+      setFilters((prev) => ({
+        ...prev,
+        eventType: prev.eventType === "outdoor" ? "" : "outdoor",
+      }));
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-dark)] mb-4">
         Event Calendar
       </h1>
-      <p className="text-[var(--text)] mb-8">
+      <p className="text-[var(--text)] mb-6">
         Browse family-friendly events across Baltimore and surrounding counties.
       </p>
+
+      {/* Quick Filter Pills */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        <button
+          onClick={() => handleQuickFilter("free")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            filters.costType === "free"
+              ? "bg-green-500 text-white"
+              : "bg-[var(--card)] text-[var(--text)] hover:bg-green-100"
+          }`}
+        >
+          🆓 Free Only
+        </button>
+        <button
+          onClick={() => handleQuickFilter("toddler")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            filters.ageRange === "toddler"
+              ? "bg-purple-500 text-white"
+              : "bg-[var(--card)] text-[var(--text)] hover:bg-purple-100"
+          }`}
+        >
+          👶 Toddler-Friendly
+        </button>
+        <button
+          onClick={() => handleQuickFilter("outdoor")}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            filters.eventType === "outdoor"
+              ? "bg-green-600 text-white"
+              : "bg-[var(--card)] text-[var(--text)] hover:bg-green-100"
+          }`}
+        >
+          🌳 Outdoor
+        </button>
+      </div>
 
       {/* Filters */}
       <FilterBar
