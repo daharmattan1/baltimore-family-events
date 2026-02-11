@@ -125,9 +125,12 @@ export default function FeaturedEvents() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {events.map((event) => (
-            <div
+            <a
               key={event.id}
-              className="bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow"
+              href={event.source_url || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow no-underline cursor-pointer"
             >
               {/* Icon and date */}
               <div className="flex items-start justify-between mb-3">
@@ -167,7 +170,7 @@ export default function FeaturedEvents() {
                     : event.cost_amount || event.cost_type}
                 </span>
               )}
-            </div>
+            </a>
           ))}
         </div>
 
