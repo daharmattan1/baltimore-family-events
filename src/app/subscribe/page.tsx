@@ -88,7 +88,7 @@ export default function SubscribePage() {
       {/* Trust indicators */}
       <div className="mt-8 text-center">
         <p className="text-[var(--muted)] text-sm">
-          Join hundreds of Baltimore families who discover great events every week.
+          Join Baltimore families discovering great events every week. Built by a local dad.
         </p>
       </div>
     </div>

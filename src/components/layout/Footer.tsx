@@ -44,6 +44,11 @@ export default function Footer() {
                   Subscribe
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors no-underline hover:no-underline">
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 

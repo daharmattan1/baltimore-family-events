@@ -10,19 +10,62 @@ export default function AboutPage() {
         How we find and curate the best family events in Baltimore.
       </p>
 
+      {/* Who Built This - Founder Section */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold text-[var(--text-dark)] mb-6">
+          Who Built This
+        </h2>
+        <div className="bg-[var(--card)] rounded-xl p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row gap-6">
+            {/* Stats */}
+            <div className="flex sm:flex-col gap-4 sm:gap-2 text-center sm:text-left flex-wrap justify-center sm:justify-start">
+              <div className="bg-white rounded-lg px-4 py-2">
+                <div className="text-xl font-bold text-[var(--primary)]">15</div>
+                <div className="text-xs text-[var(--muted)]">Years in Tech</div>
+              </div>
+              <div className="bg-white rounded-lg px-4 py-2">
+                <div className="text-xl font-bold text-[var(--primary)]">2</div>
+                <div className="text-xs text-[var(--muted)]">Kids</div>
+              </div>
+              <div className="bg-white rounded-lg px-4 py-2">
+                <div className="text-xl font-bold text-[var(--accent)]">1</div>
+                <div className="text-xs text-[var(--muted)]">Tired Dad</div>
+              </div>
+            </div>
+            {/* Story */}
+            <div className="flex-1">
+              <p className="text-[var(--text)] mb-4">
+                I&apos;m Victor, a Baltimore dad with two young kids. After 15 years scaling tech companies—including
+                building <strong>BurnAlong right here in Baltimore</strong>—I got tired of the weekly ritual:
+                scrolling through 20+ websites, Facebook groups, and library calendars just to figure out what
+                to do Saturday morning.
+              </p>
+              <p className="text-[var(--text)] mb-4">
+                So I built this. The same systems I use to scale businesses? Now they scan 112 sources every week.
+                Five AI &quot;parent personas&quot; evaluate every event—asking the questions real parents ask.
+                You get the curated best, delivered Thursday morning.
+              </p>
+              <p className="text-[var(--text)] italic">
+                Your weekend time with your family is too valuable to waste on event research. I fixed that.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Why We Built This */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-[var(--text-dark)] mb-4">
-          Why We Built This
+          Why This Exists
         </h2>
         <p className="text-[var(--text)] mb-4">
           Finding family events in Baltimore shouldn&apos;t require checking 20 different websites,
-          Facebook groups, and community calendars. We built this service to aggregate and
-          curate the best family activities so you can spend less time searching and more
+          Facebook groups, and community calendars. This service aggregates and
+          curates the best family activities so you can spend less time searching and more
           time making memories.
         </p>
         <p className="text-[var(--text)]">
-          Every week, our AI scans 112+ sources across 5 counties, then 5 specialized personas
+          Every week, AI scans 112+ sources across 5 counties, then 5 specialized personas
           evaluate each event to surface only what&apos;s truly worth your family&apos;s time.
         </p>
       </section>
@@ -39,8 +82,8 @@ export default function AboutPage() {
         </p>
 
         <div className="space-y-6">
-          <div className="bg-[var(--card)] rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+          <div className="bg-[var(--card)] rounded-xl p-6 border-t-4 border-t-[var(--accent)]">
+            <h3 className="text-lg font-semibold text-[var(--accent)] mb-2">
               🎯 Weekend Warrior
             </h3>
             <p className="text-sm text-[var(--muted)] mb-2">Sarah, 38 — &quot;What&apos;s THE thing this Saturday?&quot;</p>
@@ -51,8 +94,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-[var(--card)] rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+          <div className="bg-[var(--card)] rounded-xl p-6 border-t-4 border-t-green-500">
+            <h3 className="text-lg font-semibold text-green-600 mb-2">
               💰 Budget-Conscious
             </h3>
             <p className="text-sm text-[var(--muted)] mb-2">Marcus, 41 — &quot;What&apos;s the best bang for our buck?&quot;</p>
@@ -63,8 +106,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-[var(--card)] rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+          <div className="bg-[var(--card)] rounded-xl p-6 border-t-4 border-t-purple-500">
+            <h3 className="text-lg font-semibold text-purple-600 mb-2">
               👶 Toddler Wrangler
             </h3>
             <p className="text-sm text-[var(--muted)] mb-2">Jamie, 34 — &quot;Can we actually do this with a toddler?&quot;</p>
@@ -75,8 +118,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-[var(--card)] rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+          <div className="bg-[var(--card)] rounded-xl p-6 border-t-4 border-t-blue-500">
+            <h3 className="text-lg font-semibold text-blue-600 mb-2">
               😎 Tween Entertainer
             </h3>
             <p className="text-sm text-[var(--muted)] mb-2">David, 45 — &quot;Will they roll their eyes or tell their friends?&quot;</p>
@@ -87,8 +130,8 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="bg-[var(--card)] rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-[var(--primary)] mb-2">
+          <div className="bg-[var(--card)] rounded-xl p-6 border-t-4 border-t-pink-500">
+            <h3 className="text-lg font-semibold text-pink-600 mb-2">
               📅 Plan-Ahead
             </h3>
             <p className="text-sm text-[var(--muted)] mb-2">Christina, 39 — &quot;What should I calendar NOW?&quot;</p>
@@ -149,7 +192,7 @@ export default function AboutPage() {
           Get the Best Events Weekly
         </h2>
         <p className="text-[var(--text)] mb-4">
-          Join hundreds of Baltimore families who get our free curated digest every Thursday.
+          Join Baltimore families discovering great events every Thursday. Free forever.
         </p>
         <Link
           href="/subscribe"

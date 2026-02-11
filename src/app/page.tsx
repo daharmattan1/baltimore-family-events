@@ -85,8 +85,8 @@ export default function Home() {
             Never Miss a Great Event
           </h2>
           <p className="text-[var(--text)] mb-8">
-            Join hundreds of Baltimore families who get our free weekly digest.
-            Unsubscribe anytime.
+            Join Baltimore families discovering great events every week.
+            Free forever. Unsubscribe anytime.
           </p>
           <Link
             href="/subscribe"
