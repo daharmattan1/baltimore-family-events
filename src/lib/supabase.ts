@@ -1,9 +1,42 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Lazy-initialize Supabase client to avoid build-time errors
+// Supports both NEXT_PUBLIC_ prefixed vars and Vercel Supabase integration vars
+let supabaseInstance: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+function getSupabaseClient(): SupabaseClient {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  // Try multiple env var names (Vercel integration may use different names)
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.SUPABASE_URL ||
+    process.env.POSTGRES_URL?.replace(/^postgres:\/\//, "https://").split("?")[0];
+
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.SUPABASE_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY"
+    );
+  }
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    db: {
+      schema: "baltimore", // Use the baltimore schema
+    },
+  });
+
+  return supabaseInstance;
+}
+
+// Export getter instead of direct client
+export const getSupabase = getSupabaseClient;
 
 // Event type matching the baltimore.events table
 export interface BaltimoreEvent {
@@ -45,6 +78,8 @@ export interface EventFilters {
 
 // Fetch events with optional filters
 export async function fetchEvents(filters: EventFilters = {}) {
+  const supabase = getSupabase();
+
   let query = supabase
     .from("events")
     .select("*")
@@ -99,6 +134,8 @@ export async function fetchEvents(filters: EventFilters = {}) {
 
 // Fetch featured events for homepage
 export async function fetchFeaturedEvents(limit = 4) {
+  const supabase = getSupabase();
+
   const { data, error } = await supabase
     .from("events")
     .select("*")
