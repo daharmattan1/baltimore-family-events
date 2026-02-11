@@ -1,11 +1,11 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 // Lazy-initialize Supabase client to avoid build-time errors
 // Supports both NEXT_PUBLIC_ prefixed vars and Vercel Supabase integration vars
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let supabaseInstance: SupabaseClient<any, "baltimore", any> | null = null;
+let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
-function getSupabaseClient(): SupabaseClient<any, "baltimore", any> {
+function getSupabaseClient() {
   if (supabaseInstance) {
     return supabaseInstance;
   }
@@ -13,31 +13,33 @@ function getSupabaseClient(): SupabaseClient<any, "baltimore", any> {
   // Try multiple env var names (Vercel integration may use different names)
   const supabaseUrl =
     process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.SUPABASE_URL ||
-    process.env.POSTGRES_URL?.replace(/^postgres:\/\//, "https://").split("?")[0];
+    process.env.SUPABASE_URL;
 
   const supabaseAnonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.SUPABASE_ANON_KEY ||
     process.env.SUPABASE_KEY;
 
+  // Log which env vars are available (without exposing values)
+  console.log("Supabase config:", {
+    hasUrl: !!supabaseUrl,
+    hasKey: !!supabaseAnonKey,
+    urlSource: process.env.NEXT_PUBLIC_SUPABASE_URL ? "NEXT_PUBLIC_SUPABASE_URL" :
+               process.env.SUPABASE_URL ? "SUPABASE_URL" : "none",
+  });
+
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      `Missing Supabase environment variables. hasUrl=${!!supabaseUrl}, hasKey=${!!supabaseAnonKey}`
     );
   }
 
   // Create client with baltimore schema as default
-  // The third generic parameter sets the schema
-  supabaseInstance = createClient<any, "baltimore", any>(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      db: {
-        schema: "baltimore",
-      },
-    }
-  );
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+    db: {
+      schema: "baltimore",
+    },
+  });
 
   return supabaseInstance;
 }

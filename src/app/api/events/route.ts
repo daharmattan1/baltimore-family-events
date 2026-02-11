@@ -41,8 +41,12 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("API Error:", error);
+    // Better error serialization
+    const errorMessage = error instanceof Error
+      ? error.message
+      : JSON.stringify(error);
     return NextResponse.json(
-      { error: "Failed to fetch events", details: String(error) },
+      { error: "Failed to fetch events", details: errorMessage },
       { status: 500 }
     );
   }
