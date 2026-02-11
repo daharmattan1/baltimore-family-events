@@ -35,11 +35,12 @@ function getSupabaseClient() {
   }
 
   // Create client with baltimore schema as default
+  // Using type assertion because the TypeScript types don't properly support custom schemas
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
     db: {
       schema: "baltimore",
     },
-  });
+  } as unknown as Parameters<typeof createClient>[2]);
 
   return supabaseInstance;
 }
