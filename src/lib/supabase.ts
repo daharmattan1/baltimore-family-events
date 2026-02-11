@@ -1,11 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // Lazy-initialize Supabase client to avoid build-time errors
 // Supports both NEXT_PUBLIC_ prefixed vars and Vercel Supabase integration vars
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
+let supabaseInstance: SupabaseClient<any, "baltimore", any> | null = null;
 
-function getSupabaseClient() {
+function getSupabaseClient(): SupabaseClient<any, "baltimore", any> {
   if (supabaseInstance) {
     return supabaseInstance;
   }
@@ -27,7 +27,17 @@ function getSupabaseClient() {
     );
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  // Create client with baltimore schema as default
+  // The third generic parameter sets the schema
+  supabaseInstance = createClient<any, "baltimore", any>(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      db: {
+        schema: "baltimore",
+      },
+    }
+  );
 
   return supabaseInstance;
 }
@@ -74,12 +84,11 @@ export interface EventFilters {
 }
 
 // Fetch events with optional filters
-// Note: Uses baltimore schema via .schema() method
+// Note: baltimore schema is set at client initialization
 export async function fetchEvents(filters: EventFilters = {}) {
   const supabase = getSupabase();
 
   let query = supabase
-    .schema("baltimore")
     .from("events")
     .select("*")
     .eq("is_relevant", true)
@@ -132,12 +141,11 @@ export async function fetchEvents(filters: EventFilters = {}) {
 }
 
 // Fetch featured events for homepage
-// Note: Uses baltimore schema via .schema() method
+// Note: baltimore schema is set at client initialization
 export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
 
   const { data, error } = await supabase
-    .schema("baltimore")
     .from("events")
     .select("*")
     .eq("is_relevant", true)
