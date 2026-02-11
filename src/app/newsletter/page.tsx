@@ -13,6 +13,21 @@ function formatDate(dateStr?: string): string {
   });
 }
 
+// Extract a preview snippet from newsletter content
+function getPreviewSnippet(content: string): string {
+  // Remove markdown formatting and get first ~150 chars
+  const cleaned = content
+    .replace(/^#.*$/gm, "") // Remove headings
+    .replace(/\*\*/g, "") // Remove bold
+    .replace(/\*/g, "") // Remove italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Convert links to text
+    .replace(/---/g, "") // Remove hr
+    .replace(/\n+/g, " ") // Convert newlines to spaces
+    .trim();
+
+  return cleaned.slice(0, 150) + (cleaned.length > 150 ? "..." : "");
+}
+
 export default function NewsletterPage() {
   const newsletters = getAllNewsletters();
 
@@ -45,7 +60,7 @@ export default function NewsletterPage() {
               href={`/newsletter/${newsletter.slug}`}
               className="block bg-white border border-[var(--muted)]/20 rounded-xl p-6 hover:shadow-lg transition-shadow no-underline"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between mb-2">
                 <div>
                   <h2 className="text-lg font-semibold text-[var(--text-dark)] mb-1">
                     {newsletter.dateRange || newsletter.title}
@@ -54,10 +69,14 @@ export default function NewsletterPage() {
                     Published {formatDate(newsletter.generated)}
                   </p>
                 </div>
-                <span className="text-[var(--primary)] font-medium">
+                <span className="text-[var(--primary)] font-medium shrink-0">
                   Read →
                 </span>
               </div>
+              {/* Preview snippet */}
+              <p className="text-sm text-[var(--text)] line-clamp-2">
+                {getPreviewSnippet(newsletter.content)}
+              </p>
             </Link>
           ))}
         </div>

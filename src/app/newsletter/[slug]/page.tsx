@@ -115,6 +115,51 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
                 {children}
               </strong>
             ),
+            // Style code blocks (often contain agent reasoning)
+            code: ({ children, className }) => {
+              const isInline = !className;
+              if (isInline) {
+                return (
+                  <code className="bg-[var(--card)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--text-dark)]">
+                    {children}
+                  </code>
+                );
+              }
+              return (
+                <code className={`block bg-[var(--card)] p-4 rounded-lg text-sm font-mono overflow-x-auto ${className}`}>
+                  {children}
+                </code>
+              );
+            },
+            // Style pre blocks
+            pre: ({ children }) => (
+              <pre className="bg-[var(--card)] p-4 rounded-lg overflow-x-auto my-4 text-sm">
+                {children}
+              </pre>
+            ),
+            // Style tables for agent reasoning traces
+            table: ({ children }) => (
+              <div className="overflow-x-auto my-4">
+                <table className="min-w-full border border-[var(--muted)]/30 rounded-lg overflow-hidden">
+                  {children}
+                </table>
+              </div>
+            ),
+            thead: ({ children }) => (
+              <thead className="bg-[var(--primary)]/10">
+                {children}
+              </thead>
+            ),
+            th: ({ children }) => (
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[var(--text-dark)] border-b border-[var(--muted)]/30">
+                {children}
+              </th>
+            ),
+            td: ({ children }) => (
+              <td className="px-4 py-2 text-sm text-[var(--text)] border-b border-[var(--muted)]/20">
+                {children}
+              </td>
+            ),
           }}
         >
           {newsletter.content}
