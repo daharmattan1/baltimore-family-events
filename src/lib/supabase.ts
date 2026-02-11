@@ -140,23 +140,44 @@ export async function fetchEvents(filters: EventFilters = {}) {
 }
 
 // Fetch featured events for homepage
-// Note: baltimore schema is set at client initialization
+// First tries featured_worthy=true, falls back to highest scoring events
 export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
+  const today = new Date().toISOString().split("T")[0];
 
-  const { data, error } = await supabase
+  // First try to get events marked as featured
+  const { data: featuredData, error: featuredError } = await supabase
     .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
     .eq("featured_worthy", true)
-    .gte("event_date_start", new Date().toISOString().split("T")[0])
+    .gte("event_date_start", today)
     .order("family_friendly_score", { ascending: false })
     .limit(limit);
 
-  if (error) {
-    console.error("Error fetching featured events:", error);
-    throw error;
+  if (featuredError) {
+    console.error("Error fetching featured events:", featuredError);
   }
 
-  return data as BaltimoreEvent[];
+  // If we got featured events, return them
+  if (featuredData && featuredData.length >= limit) {
+    return featuredData as BaltimoreEvent[];
+  }
+
+  // Fall back to highest-scoring events if no/few featured ones
+  const { data: topData, error: topError } = await supabase
+    .from("baltimore_events")
+    .select("*")
+    .eq("is_relevant", true)
+    .gte("event_date_start", today)
+    .order("family_friendly_score", { ascending: false, nullsFirst: false })
+    .order("event_date_start", { ascending: true })
+    .limit(limit);
+
+  if (topError) {
+    console.error("Error fetching top events:", topError);
+    throw topError;
+  }
+
+  return topData as BaltimoreEvent[];
 }

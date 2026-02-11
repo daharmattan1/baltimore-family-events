@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FeaturedEvents from "@/components/sections/FeaturedEvents";
 
 export default function Home() {
   return (
@@ -30,29 +31,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Events Placeholder */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-dark)] mb-8 text-center">
-            Featured This Week
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="bg-[var(--card)] rounded-xl p-6 animate-pulse"
-              >
-                <div className="h-4 bg-[var(--muted)]/30 rounded w-3/4 mb-4"></div>
-                <div className="h-3 bg-[var(--muted)]/20 rounded w-1/2 mb-2"></div>
-                <div className="h-3 bg-[var(--muted)]/20 rounded w-2/3"></div>
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-[var(--muted)] mt-6">
-            Coming soon: Real events from Supabase
-          </p>
-        </div>
-      </section>
+      {/* Featured Events - Real data from Supabase */}
+      <FeaturedEvents />
 
       {/* How It Works */}
       <section className="py-16 bg-[var(--card)]">
