@@ -34,13 +34,9 @@ function getSupabaseClient() {
     );
   }
 
-  // Create client with baltimore schema as default
-  // Using type assertion because the TypeScript types don't properly support custom schemas
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-    db: {
-      schema: "baltimore",
-    },
-  } as unknown as Parameters<typeof createClient>[2]);
+  // Create client using public schema (default)
+  // The baltimore events are accessible via public.baltimore_events table/view
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
 
   return supabaseInstance;
 }
@@ -92,7 +88,7 @@ export async function fetchEvents(filters: EventFilters = {}) {
   const supabase = getSupabase();
 
   let query = supabase
-    .from("events")
+    .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
     .order("event_date_start", { ascending: true });
@@ -149,7 +145,7 @@ export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
 
   const { data, error } = await supabase
-    .from("events")
+    .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
     .eq("featured_worthy", true)

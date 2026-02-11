@@ -23,7 +23,7 @@ export async function GET() {
       // Test with public schema first
       const publicClient = createClient(supabaseUrl, supabaseKey);
       const { data: publicTest, error: publicError } = await publicClient
-        .from("events")
+        .from("baltimore_events")
         .select("count")
         .limit(1);
 
@@ -39,7 +39,7 @@ export async function GET() {
         db: { schema: "baltimore" },
       });
       const { data: baltimoreTest, error: baltimoreError } = await baltimoreClient
-        .from("events")
+        .from("baltimore_events")
         .select("id, title")
         .limit(1);
 
