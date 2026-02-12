@@ -71,16 +71,16 @@ export default function FeaturedEvents() {
   // Loading state
   if (loading) {
     return (
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-dark)] mb-8 text-center">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mb-8 text-center">
             Featured This Week
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-[var(--card)] rounded-xl p-6 animate-pulse"
+                className="bg-[var(--color-formstone)] rounded-xl p-6 animate-pulse"
               >
                 <div className="h-4 bg-[var(--muted)]/30 rounded w-3/4 mb-4"></div>
                 <div className="h-3 bg-[var(--muted)]/20 rounded w-1/2 mb-2"></div>
@@ -96,18 +96,18 @@ export default function FeaturedEvents() {
   // Error state - show fallback link to calendar
   if (error || events.length === 0) {
     return (
-      <section className="py-16">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-dark)] mb-8 text-center">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mb-8 text-center">
             Featured This Week
           </h2>
           <div className="text-center">
-            <p className="text-[var(--text)] mb-4">
+            <p className="text-[var(--color-harbor)] mb-4">
               Check out all the upcoming family events in Baltimore!
             </p>
             <Link
               href="/calendar"
-              className="inline-flex items-center justify-center px-6 py-3 bg-[var(--primary)] text-white font-semibold rounded-lg hover:bg-[var(--primary)]/90 transition-colors no-underline hover:no-underline"
+              className="btn btn-primary"
             >
               Browse All Events →
             </Link>
@@ -118,11 +118,15 @@ export default function FeaturedEvents() {
   }
 
   return (
-    <section className="py-16">
+    <section className="py-16 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-dark)] mb-8 text-center">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mb-3 text-center">
           Featured This Week
         </h2>
+        <p className="text-center text-[var(--color-harbor)] mb-8">
+          Our AI curators&apos; top picks for Baltimore families
+        </p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {events.map((event) => (
             <a
@@ -130,39 +134,40 @@ export default function FeaturedEvents() {
               href={event.source_url || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow no-underline cursor-pointer"
+              className="group block bg-white border border-[var(--muted)]/20 rounded-xl p-5 transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover no-underline cursor-pointer"
             >
               {/* Icon and date */}
               <div className="flex items-start justify-between mb-3">
                 <span className="text-2xl" aria-hidden="true">
                   {getEventTypeIcon(event.event_type)}
                 </span>
-                <span className="text-sm text-[var(--muted)]">
+                <span className="text-sm text-[var(--muted)] flex items-center gap-1">
+                  <span className="text-[var(--color-crab)]">🦀</span>
                   {formatDate(event.event_date_start)}
                 </span>
               </div>
 
               {/* Title */}
-              <h3 className="text-base font-semibold text-[var(--text-dark)] mb-2 line-clamp-2">
+              <h3 className="text-base font-semibold text-[var(--color-boh)] mb-2 line-clamp-2 group-hover:text-[var(--color-charm)] transition-colors duration-drift">
                 {event.title}
               </h3>
 
               {/* Venue */}
               {event.venue && (
-                <p className="text-sm text-[var(--text)] mb-2 line-clamp-1">
+                <p className="text-sm text-[var(--color-harbor)] mb-2 line-clamp-1">
                   📍 {event.venue}
                 </p>
               )}
 
-              {/* Cost badge - larger for free events */}
+              {/* Cost badge */}
               {event.cost_type && (
                 <span
                   className={`inline-block rounded-full font-medium ${
                     event.cost_type === "free"
-                      ? "text-sm px-3 py-1.5 bg-green-500 text-white font-bold uppercase"
+                      ? "text-sm px-3 py-1.5 bg-[var(--color-seafoam)] text-[var(--color-boh)] font-bold uppercase"
                       : event.cost_type === "donation"
-                      ? "text-xs px-2 py-1 bg-blue-100 text-blue-800"
-                      : "text-xs px-2 py-1 bg-[var(--card)] text-[var(--text)]"
+                      ? "text-xs px-2 py-1 bg-[var(--color-charm)]/10 text-[var(--color-charm)]"
+                      : "text-xs px-2 py-1 bg-[var(--color-formstone)] text-[var(--color-harbor)]"
                   }`}
                 >
                   {event.cost_type === "free"
@@ -174,10 +179,10 @@ export default function FeaturedEvents() {
           ))}
         </div>
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-10">
           <Link
             href="/calendar"
-            className="inline-flex items-center justify-center px-6 py-3 border-2 border-[var(--primary)] text-[var(--primary)] font-semibold rounded-lg hover:bg-[var(--primary)] hover:text-white transition-colors no-underline hover:no-underline"
+            className="btn btn-secondary"
           >
             View All Events →
           </Link>

@@ -58,6 +58,7 @@ export interface BaltimoreEvent {
   source_url?: string;
   image_url?: string;
   registration_url?: string;
+  original_event_url?: string;
   location_area?: string;
   age_range_category?: string;
   event_type?: string;
