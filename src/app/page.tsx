@@ -1,6 +1,34 @@
 import Link from "next/link";
 import Image from "next/image";
 import FeaturedEvents from "@/components/sections/FeaturedEvents";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Bmore Families | AI-Curated Baltimore Family Events Every Week",
+  description:
+    "Stop scrolling 20 websites. Get the best family events in Baltimore delivered Thursday. 112+ sources, 5 counties, 5 parent personas. Free forever.",
+  keywords: [
+    "Baltimore family events",
+    "things to do with kids Baltimore",
+    "Baltimore weekend activities",
+    "family friendly Baltimore",
+    "Baltimore events this weekend",
+  ],
+  openGraph: {
+    title: "Bmore Families | Your Weekend, Sorted",
+    description:
+      "AI-curated family events from 112+ sources across 5 Baltimore counties. Free weekly newsletter.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Bmore Families",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bmore Families | Your Weekend, Sorted",
+    description:
+      "Stop scrolling 20 websites. Get the best family events in Baltimore delivered every Thursday.",
+  },
+};
 
 export default function Home() {
   return (
@@ -40,9 +68,9 @@ export default function Home() {
           </h1>
 
           <p className="font-body text-lg sm:text-xl text-[var(--color-harbor)] max-w-2xl mx-auto mb-10 leading-relaxed">
-            112+ sources. 5 counties. 5 AI curators.
+            112+ sources. 5 counties. 5 parent personas picking the gems.
             <br className="hidden sm:block" />
-            Get the best family events delivered every Thursday.
+            The best family events, delivered every Thursday morning.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -97,7 +125,7 @@ export default function Home() {
             How It Works
           </h2>
           <p className="text-center text-[var(--color-harbor)] mb-12 max-w-xl mx-auto">
-            Five AI personas work together to find the events your family will actually enjoy.
+            Think of it like five different parents scouring the harbor for your perfect weekend.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -107,10 +135,10 @@ export default function Home() {
                 1
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                We Aggregate
+                We Gather
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Our AI scans 112+ sources across 5 counties for family events every week.
+                Every week, we scan 112+ sources across 5 counties to catch every family event worth knowing about.
               </p>
             </div>
 
@@ -120,10 +148,10 @@ export default function Home() {
                 2
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                5 Agents Curate
+                5 Parents Pick
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Five specialized AI personas evaluate each event for family appeal.
+                Five AI parent personas evaluate every event — asking the questions real parents ask.
               </p>
             </div>
 
@@ -133,10 +161,10 @@ export default function Home() {
                 3
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                You Discover
+                You Explore
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Get a curated digest every Thursday with the best events for your family.
+                Thursday morning, the best 5-7 events land in your inbox. Open, pick one, go.
               </p>
             </div>
           </div>
@@ -147,10 +175,10 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-4 text-center">
-            Meet Your Curators
+            Meet Your Weekend Crew
           </h2>
           <p className="text-center text-[var(--color-harbor)] mb-12 max-w-xl mx-auto">
-            Five AI personas, each with a unique perspective on family fun.
+            Five parent personas, each with a different take on what makes a great family outing.
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -214,12 +242,12 @@ export default function Home() {
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
-            Never Miss a Great Event
+            Stop Scrolling. Start Exploring.
           </h2>
           <p className="text-gray-300 mb-8 text-lg">
-            Join Baltimore families discovering great events every week.
+            Baltimore families are discovering weekend gems every Thursday morning.
             <br />
-            Free forever. Unsubscribe anytime.
+            Free forever. Unsubscribe anytime. Built by a local dad.
           </p>
           <Link
             href="/subscribe"

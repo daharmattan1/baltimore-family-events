@@ -15,6 +15,7 @@ export default function CalendarPage() {
     ageRange: "",
     costType: "",
   });
+  const [dateFilter, setDateFilter] = useState("");
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -25,6 +26,14 @@ export default function CalendarPage() {
       if (filters.eventType) params.set("eventType", filters.eventType);
       if (filters.ageRange) params.set("ageRange", filters.ageRange);
       if (filters.costType) params.set("costType", filters.costType);
+
+      if (dateFilter) {
+        const range = getDateRange(dateFilter);
+        if (range) {
+          params.set("startDate", range.start);
+          params.set("endDate", range.end);
+        }
+      }
 
       const response = await fetch(`/api/events?${params.toString()}`);
       const data = await response.json();
@@ -40,7 +49,7 @@ export default function CalendarPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, dateFilter]);
 
   useEffect(() => {
     fetchEvents();
@@ -52,6 +61,42 @@ export default function CalendarPage() {
 
   const handleClearFilters = () => {
     setFilters({ eventType: "", ageRange: "", costType: "" });
+    setDateFilter("");
+  };
+
+  // Date filter helpers
+  const getDateRange = (preset: string): { start: string; end: string } | null => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+
+    if (preset === "weekend") {
+      const saturday = new Date(today);
+      saturday.setDate(today.getDate() + (6 - dayOfWeek));
+      const sunday = new Date(saturday);
+      sunday.setDate(saturday.getDate() + 1);
+      return {
+        start: saturday.toISOString().split("T")[0],
+        end: sunday.toISOString().split("T")[0],
+      };
+    } else if (preset === "this-week") {
+      const endOfWeek = new Date(today);
+      endOfWeek.setDate(today.getDate() + (7 - dayOfWeek));
+      return {
+        start: today.toISOString().split("T")[0],
+        end: endOfWeek.toISOString().split("T")[0],
+      };
+    } else if (preset === "this-month") {
+      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      return {
+        start: today.toISOString().split("T")[0],
+        end: endOfMonth.toISOString().split("T")[0],
+      };
+    }
+    return null;
+  };
+
+  const handleDateFilter = (preset: string) => {
+    setDateFilter((prev) => (prev === preset ? "" : preset));
   };
 
   // Quick filter handlers
@@ -91,13 +136,13 @@ export default function CalendarPage() {
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-[var(--color-charm)] font-medium mb-2 tracking-wide uppercase text-sm">
-            Browse Events
+            Explore Events
           </p>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-3">
-            Event Calendar
+            Find Your Weekend
           </h1>
           <p className="text-[var(--color-harbor)] max-w-2xl">
-            Browse family-friendly events across Baltimore and surrounding counties.
+            Filter by age, price, or type to discover your perfect Saturday across 5 counties.
           </p>
         </div>
 
@@ -115,8 +160,44 @@ export default function CalendarPage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Date Filter Pills */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          <span className="text-xs text-[var(--muted)] self-center mr-1 font-medium uppercase tracking-wide">When:</span>
+          <button
+            onClick={() => handleDateFilter("weekend")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
+              dateFilter === "weekend"
+                ? "bg-[var(--color-charm)] text-white shadow-sm"
+                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
+            }`}
+          >
+            This Weekend
+          </button>
+          <button
+            onClick={() => handleDateFilter("this-week")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
+              dateFilter === "this-week"
+                ? "bg-[var(--color-charm)] text-white shadow-sm"
+                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
+            }`}
+          >
+            This Week
+          </button>
+          <button
+            onClick={() => handleDateFilter("this-month")}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
+              dateFilter === "this-month"
+                ? "bg-[var(--color-charm)] text-white shadow-sm"
+                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
+            }`}
+          >
+            This Month
+          </button>
+        </div>
+
         {/* Quick Filter Pills */}
         <div className="flex flex-wrap gap-2 mb-6">
+          <span className="text-xs text-[var(--muted)] self-center mr-1 font-medium uppercase tracking-wide">Filter:</span>
           <button
             onClick={() => handleQuickFilter("free")}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
@@ -135,7 +216,7 @@ export default function CalendarPage() {
                 : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-agent-toddler)]/10"
             }`}
           >
-            👶 Toddler-Friendly
+            👶 Ages 0-4
           </button>
           <button
             onClick={() => handleQuickFilter("outdoor")}
@@ -206,7 +287,7 @@ export default function CalendarPage() {
           <div className="bg-[var(--color-formstone)] rounded-xl p-8 text-center">
             <div className="text-4xl mb-4">🦀</div>
             <p className="text-[var(--color-harbor)] mb-4">
-              No events found matching your filters.
+              No perfect matches yet. Try loosening your filters — there are gems hiding!
             </p>
             <button
               onClick={handleClearFilters}

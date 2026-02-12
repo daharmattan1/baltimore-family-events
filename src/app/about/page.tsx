@@ -1,5 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Bmore Families | How 5 Parent Personas Find Your Weekend",
+  description:
+    "Built by a Baltimore dad tired of scrolling 20 websites. Learn how 5 AI parent personas gather family events from 112+ sources across 5 counties.",
+  openGraph: {
+    title: "About Bmore Families",
+    description:
+      "How 5 AI parent personas find the best family events in Baltimore every week.",
+  },
+};
 
 export default function AboutPage() {
   return (
@@ -76,18 +88,19 @@ export default function AboutPage() {
               {/* Story */}
               <div className="flex-1">
                 <p className="text-[var(--color-harbor)] mb-4 leading-relaxed">
-                  I&apos;m Victor, a Baltimore dad with two young kids. After 15 years scaling tech companies—including
-                  building <strong className="text-[var(--color-boh)]">BurnAlong right here in Baltimore</strong>—I got tired of the weekly ritual:
-                  scrolling through 20+ websites, Facebook groups, and library calendars just to figure out what
-                  to do Saturday morning.
+                  I&apos;m Victor, a Baltimore dad with two young kids. Last Saturday, I spent 45 minutes
+                  scrolling through 20+ websites, Facebook groups, and library calendars just to find ONE thing
+                  to do with my kids. By the time I found something good, half the morning was gone.
                 </p>
                 <p className="text-[var(--color-harbor)] mb-4 leading-relaxed">
-                  So I built this. The same systems I use to scale businesses? Now they scan 112 sources every week.
-                  Five AI &quot;parent personas&quot; evaluate every event—asking the questions real parents ask.
-                  You get the curated best, delivered Thursday morning.
+                  After 15 years scaling tech companies — including building <strong className="text-[var(--color-boh)]">BurnAlong
+                  right here in Baltimore</strong> — I realized I could fix this. The same systems I use to
+                  gather intelligence for businesses now scan 112+ sources every week. Five AI parent personas
+                  evaluate every event, asking the questions real parents ask: &quot;Can we actually do this
+                  with a toddler?&quot; &quot;Is it worth the drive?&quot; &quot;What&apos;s it really cost?&quot;
                 </p>
                 <p className="text-[var(--color-charm)] italic font-medium">
-                  Your weekend time with your family is too valuable to waste on event research. I fixed that.
+                  Your weekend time with your family is too valuable to spend scrolling. I fixed that.
                 </p>
               </div>
             </div>
@@ -97,29 +110,29 @@ export default function AboutPage() {
         {/* Why We Built This */}
         <section className="mb-16">
           <h2 className="font-display text-2xl font-bold text-[var(--color-boh)] mb-4">
-            Why This Exists
+            The Problem We Solve
           </h2>
           <p className="text-[var(--color-harbor)] mb-4 leading-relaxed">
-            Finding family events in Baltimore shouldn&apos;t require checking 20 different websites,
-            Facebook groups, and community calendars. This service aggregates and
-            curates the best family activities so you can spend less time searching and more
-            time making memories.
+            Baltimore has incredible family events. The problem? They&apos;re scattered across
+            library websites, parks departments, Facebook groups, museum calendars, and
+            neighborhood newsletters. No parent has time to check all of them.
           </p>
           <p className="text-[var(--color-harbor)] leading-relaxed">
-            Every week, AI scans 112+ sources across 5 counties, then 5 specialized personas
-            evaluate each event to surface only what&apos;s truly worth your family&apos;s time.
+            We gather everything into one place, then five parent personas pick the gems.
+            You get the 5-7 best events for this weekend — delivered Thursday morning,
+            so you can actually plan ahead.
           </p>
         </section>
 
         {/* The 5-Agent System */}
         <section className="mb-16">
           <h2 className="font-display text-2xl font-bold text-[var(--color-boh)] mb-4">
-            The 5-Agent Curation System
+            Your 5 Parent Personas
           </h2>
           <p className="text-[var(--color-harbor)] mb-8 leading-relaxed">
-            Every event is evaluated by 5 AI personas, each bringing a unique perspective
-            on what makes an event great for families. They don&apos;t just check boxes—they
-            read event descriptions and think critically like real parents would.
+            Think of it like five different parents reviewing each event. They don&apos;t just
+            check boxes — they read event descriptions and ask the questions you&apos;d ask.
+            When 4 or more agree, that&apos;s a Top Pick.
           </p>
 
           <div className="space-y-6">
@@ -288,10 +301,10 @@ export default function AboutPage() {
 
           <div className="relative">
             <h2 className="font-display text-2xl font-bold mb-3">
-              Get the Best Events Weekly
+              Discover Your Weekend
             </h2>
             <p className="text-gray-300 mb-6">
-              Join Baltimore families discovering great events every Thursday. Free forever.
+              The best family events in Baltimore, gathered and delivered every Thursday. Free forever.
             </p>
             <Link
               href="/subscribe"

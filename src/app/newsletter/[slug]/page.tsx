@@ -2,11 +2,33 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { getNewsletterBySlug, getAllNewsletterSlugs } from "@/lib/newsletters";
+import type { Metadata } from "next";
 
 // Generate static params for all newsletters
 export function generateStaticParams() {
   const slugs = getAllNewsletterSlugs();
   return slugs.map((slug) => ({ slug }));
+}
+
+// Dynamic metadata for each newsletter issue
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const newsletter = getNewsletterBySlug(slug);
+  if (!newsletter) return { title: "Newsletter | Bmore Families" };
+
+  const title = newsletter.dateRange || newsletter.title;
+  return {
+    title: `${title} | Bmore Families Newsletter`,
+    description: `Baltimore family events for ${title}. AI-curated picks from 112+ sources across 5 counties.`,
+    openGraph: {
+      title: `${title} | Bmore Families`,
+      description: `This week's best family events in Baltimore.`,
+    },
+  };
 }
 
 // Format date for display
@@ -33,20 +55,22 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
     notFound();
   }
 
+  const issueTitle = newsletter.dateRange || newsletter.title;
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Back link */}
       <Link
         href="/newsletter"
-        className="inline-flex items-center text-[var(--primary)] hover:text-[var(--primary)]/80 mb-8 no-underline"
+        className="inline-flex items-center text-[var(--color-charm)] hover:text-[var(--color-crab)] mb-8 no-underline transition-colors"
       >
         ← Back to Archive
       </Link>
 
       {/* Header */}
       <header className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-dark)] mb-2">
-          {newsletter.dateRange || newsletter.title}
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-2">
+          {issueTitle}
         </h1>
         <p className="text-[var(--muted)]">
           Published {formatDate(newsletter.generated)}
@@ -54,7 +78,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
       </header>
 
       {/* Newsletter content */}
-      <article className="prose prose-lg max-w-none prose-headings:text-[var(--text-dark)] prose-p:text-[var(--text)] prose-a:text-[var(--primary)] prose-strong:text-[var(--text-dark)] prose-li:text-[var(--text)]">
+      <article className="prose prose-lg max-w-none prose-headings:text-[var(--color-boh)] prose-p:text-[var(--color-harbor)] prose-a:text-[var(--color-charm)] prose-strong:text-[var(--color-boh)] prose-li:text-[var(--color-harbor)]">
         <ReactMarkdown
           components={{
             // Custom rendering for links to open in new tab
@@ -63,47 +87,47 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[var(--primary)] hover:underline"
+                className="text-[var(--color-charm)] hover:underline"
               >
                 {children}
               </a>
             ),
             // Style headings
             h1: ({ children }) => (
-              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-dark)] mt-8 mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mt-8 mb-4">
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-dark)] mt-8 mb-4 border-b border-[var(--muted)]/20 pb-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-boh)] mt-8 mb-4 border-b border-[var(--muted)]/20 pb-2">
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className="text-lg font-semibold text-[var(--text-dark)] mt-6 mb-2">
+              <h3 className="text-lg font-semibold text-[var(--color-boh)] mt-6 mb-2">
                 {children}
               </h3>
             ),
             // Style paragraphs
             p: ({ children }) => (
-              <p className="text-[var(--text)] mb-4 leading-relaxed">
+              <p className="text-[var(--color-harbor)] mb-4 leading-relaxed">
                 {children}
               </p>
             ),
             // Style lists
             ul: ({ children }) => (
-              <ul className="list-disc list-inside mb-4 space-y-2 text-[var(--text)]">
+              <ul className="list-disc list-inside mb-4 space-y-2 text-[var(--color-harbor)]">
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
-              <ol className="list-decimal list-inside mb-4 space-y-2 text-[var(--text)]">
+              <ol className="list-decimal list-inside mb-4 space-y-2 text-[var(--color-harbor)]">
                 {children}
               </ol>
             ),
             // Style blockquotes
             blockquote: ({ children }) => (
-              <blockquote className="border-l-4 border-[var(--primary)] pl-4 italic text-[var(--text)] my-4">
+              <blockquote className="border-l-4 border-[var(--color-charm)] pl-4 italic text-[var(--color-harbor)] my-4">
                 {children}
               </blockquote>
             ),
@@ -111,7 +135,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
             hr: () => <hr className="my-8 border-[var(--muted)]/30" />,
             // Style strong text
             strong: ({ children }) => (
-              <strong className="font-semibold text-[var(--text-dark)]">
+              <strong className="font-semibold text-[var(--color-boh)]">
                 {children}
               </strong>
             ),
@@ -120,20 +144,20 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
               const isInline = !className;
               if (isInline) {
                 return (
-                  <code className="bg-[var(--card)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--text-dark)]">
+                  <code className="bg-[var(--color-formstone)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--color-boh)]">
                     {children}
                   </code>
                 );
               }
               return (
-                <code className={`block bg-[var(--card)] p-4 rounded-lg text-sm font-mono overflow-x-auto ${className}`}>
+                <code className={`block bg-[var(--color-formstone)] p-4 rounded-lg text-sm font-mono overflow-x-auto ${className}`}>
                   {children}
                 </code>
               );
             },
             // Style pre blocks
             pre: ({ children }) => (
-              <pre className="bg-[var(--card)] p-4 rounded-lg overflow-x-auto my-4 text-sm">
+              <pre className="bg-[var(--color-formstone)] p-4 rounded-lg overflow-x-auto my-4 text-sm">
                 {children}
               </pre>
             ),
@@ -146,17 +170,17 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
               </div>
             ),
             thead: ({ children }) => (
-              <thead className="bg-[var(--primary)]/10">
+              <thead className="bg-[var(--color-charm)]/10">
                 {children}
               </thead>
             ),
             th: ({ children }) => (
-              <th className="px-4 py-2 text-left text-sm font-semibold text-[var(--text-dark)] border-b border-[var(--muted)]/30">
+              <th className="px-4 py-2 text-left text-sm font-semibold text-[var(--color-boh)] border-b border-[var(--muted)]/30">
                 {children}
               </th>
             ),
             td: ({ children }) => (
-              <td className="px-4 py-2 text-sm text-[var(--text)] border-b border-[var(--muted)]/20">
+              <td className="px-4 py-2 text-sm text-[var(--color-harbor)] border-b border-[var(--muted)]/20">
                 {children}
               </td>
             ),
@@ -166,17 +190,28 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
         </ReactMarkdown>
       </article>
 
+      {/* Share + Forward */}
+      <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center py-6 border-t border-[var(--muted)]/20">
+        <p className="text-sm text-[var(--color-harbor)]">Know a Baltimore parent who&apos;d love this?</p>
+        <a
+          href={`mailto:?subject=${encodeURIComponent(`Check out Bmore Families: ${issueTitle}`)}&body=${encodeURIComponent(`I thought you'd like this weekly Baltimore family events newsletter:\n\nhttps://bmorefamilies.com/newsletter/${slug}`)}`}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-formstone)] text-[var(--color-boh)] rounded-lg hover:bg-[var(--color-charm)]/10 transition-colors text-sm font-medium no-underline"
+        >
+          Forward to a Friend →
+        </a>
+      </div>
+
       {/* CTA */}
-      <div className="mt-12 p-8 bg-[var(--card)] rounded-xl text-center">
-        <h2 className="text-xl font-bold text-[var(--text-dark)] mb-2">
-          Enjoy this newsletter?
+      <div className="mt-4 p-8 bg-[var(--color-formstone)] rounded-xl text-center">
+        <h2 className="font-display text-xl font-bold text-[var(--color-boh)] mb-2">
+          Enjoy this issue? 🦀
         </h2>
-        <p className="text-[var(--text)] mb-4">
-          Get the best family events delivered to your inbox every week.
+        <p className="text-[var(--color-harbor)] mb-4">
+          Get the best family events delivered every Thursday morning.
         </p>
         <Link
           href="/subscribe"
-          className="inline-flex items-center justify-center px-6 py-3 bg-[var(--accent)] text-white font-semibold rounded-lg hover:bg-[var(--accent)]/90 transition-colors no-underline hover:no-underline"
+          className="inline-flex items-center justify-center px-6 py-3 bg-[var(--color-crab)] text-white font-semibold rounded-xl hover:bg-[var(--color-crab)]/90 transition-all no-underline hover:no-underline shadow-crab"
         >
           Subscribe Free →
         </Link>

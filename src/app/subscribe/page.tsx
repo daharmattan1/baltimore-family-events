@@ -1,4 +1,16 @@
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Subscribe to Bmore Families | Free Weekly Baltimore Family Events",
+  description:
+    "Get the best family-friendly events in Baltimore delivered to your inbox every Thursday at 7am. 112+ sources, 5 parent personas, always free.",
+  openGraph: {
+    title: "Subscribe to Bmore Families",
+    description:
+      "The best 5-7 family events for THIS weekend, delivered Thursday morning. Free forever.",
+  },
+};
 
 export default function SubscribePage() {
   return (
@@ -31,11 +43,11 @@ export default function SubscribePage() {
             Free Weekly Newsletter
           </p>
           <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--color-boh)] mb-4">
-            Subscribe to <span className="text-[var(--color-crab)]">Bmore Families</span>
+            Never Miss a <span className="text-[var(--color-crab)]">Weekend</span> Again
           </h1>
           <p className="text-lg text-[var(--color-harbor)] max-w-xl mx-auto">
-            Get the best family-friendly events delivered to your inbox every Thursday.
-            AI-curated from 112+ sources. Always free.
+            The best 5-7 family events for THIS weekend, delivered Thursday at 7am.
+            112+ sources. Zero scrolling. Always free.
           </p>
         </div>
 
@@ -63,10 +75,10 @@ export default function SubscribePage() {
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🦀</div>
                 <h2 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-2">
-                  Join the Newsletter
+                  Your Weekend Starts Here
                 </h2>
                 <p className="text-[var(--color-harbor)]">
-                  Enter your email to get the weekly family events digest.
+                  Every Thursday at 7am — the weekend&apos;s best family events, ready to explore.
                 </p>
               </div>
 
@@ -162,12 +174,15 @@ export default function SubscribePage() {
           </div>
 
           {/* Trust indicators */}
-          <div className="mt-10 text-center">
-            <p className="text-[var(--muted)] text-sm mb-2">
-              Join Baltimore families discovering great events every week.
+          <div className="mt-10 text-center space-y-2">
+            <p className="text-[var(--muted)] text-sm">
+              Delivered every Thursday at 7am. 2-minute read.
             </p>
             <p className="text-[var(--color-charm)] text-sm font-medium">
               🦀 Built by a local dad in Baltimore
+            </p>
+            <p className="text-[var(--muted)] text-xs">
+              <a href="/privacy" className="underline hover:text-[var(--color-charm)]">Privacy policy</a> — We never share your email.
             </p>
           </div>
         </div>

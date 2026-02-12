@@ -10,12 +10,62 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Baltimore Family Events | Weekly Curated Events for Families",
-  description: "Discover the best family-friendly events in Baltimore. AI-curated from 112+ sources across 5 counties. Free weekly newsletter.",
+  title: {
+    default: "Bmore Families | AI-Curated Baltimore Family Events",
+    template: "%s | Bmore Families",
+  },
+  description:
+    "Discover the best family-friendly events in Baltimore. AI-curated from 112+ sources across 5 counties. Free weekly newsletter every Thursday.",
+  metadataBase: new URL("https://bmorefamilies.com"),
   openGraph: {
-    title: "Baltimore Family Events",
-    description: "Discover the best family-friendly events in Baltimore. AI-curated from 112+ sources.",
+    title: "Bmore Families | Your Weekend, Sorted",
+    description:
+      "AI-curated family events from 112+ sources across 5 Baltimore counties. Free weekly newsletter.",
     type: "website",
+    locale: "en_US",
+    siteName: "Bmore Families",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bmore Families | Your Weekend, Sorted",
+    description:
+      "Stop scrolling 20 websites. The best family events in Baltimore, delivered every Thursday.",
+  },
+  keywords: [
+    "Baltimore family events",
+    "things to do with kids Baltimore",
+    "Baltimore weekend activities",
+    "family friendly Baltimore",
+    "Baltimore events this weekend",
+  ],
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Bmore Families",
+  description:
+    "AI-curated family events newsletter for the Baltimore metropolitan area",
+  url: "https://bmorefamilies.com",
+  applicationCategory: "Lifestyle",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  areaServed: {
+    "@type": "Place",
+    name: "Baltimore Metropolitan Area",
+  },
+  creator: {
+    "@type": "Person",
+    name: "Victor Sowers",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Baltimore",
+      addressRegion: "MD",
+    },
   },
 };
 
@@ -26,6 +76,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${inter.variable} antialiased bg-[var(--bg)] text-[var(--text)]`}>
         <Header />
         <main className="min-h-screen">
