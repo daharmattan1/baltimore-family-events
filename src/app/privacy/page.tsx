@@ -3,7 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Bmore Families",
+  title: "Privacy Policy",
   description:
     "How Bmore Families handles your data. TL;DR: We collect your email, that's it. We don't sell data.",
 };

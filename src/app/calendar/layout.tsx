@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Baltimore Family Events Calendar | Bmore Families",
+  title: "Baltimore Family Events Calendar",
   description:
     "Browse 100+ family-friendly events across Baltimore City, Baltimore County, Anne Arundel, Howard, and Harford counties. Filter by age, cost, and type.",
   openGraph: {

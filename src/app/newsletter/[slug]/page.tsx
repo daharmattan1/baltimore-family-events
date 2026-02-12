@@ -18,14 +18,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const newsletter = getNewsletterBySlug(slug);
-  if (!newsletter) return { title: "Newsletter | Bmore Families" };
+  if (!newsletter) return { title: "Newsletter" };
 
   const title = newsletter.dateRange || newsletter.title;
   return {
-    title: `${title} | Bmore Families Newsletter`,
+    title: `${title} | Newsletter`,
     description: `Baltimore family events for ${title}. AI-curated picks from 112+ sources across 5 counties.`,
     openGraph: {
-      title: `${title} | Bmore Families`,
+      title: `${title} | Newsletter`,
       description: `This week's best family events in Baltimore.`,
     },
   };

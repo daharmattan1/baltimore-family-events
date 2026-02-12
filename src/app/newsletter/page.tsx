@@ -4,7 +4,7 @@ import { getAllNewsletters } from "@/lib/newsletters";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Newsletter Archive | Bmore Families",
+  title: "Newsletter Archive",
   description:
     "Browse past issues of the Bmore Families weekly newsletter. AI-curated family events across 5 Baltimore counties.",
 };

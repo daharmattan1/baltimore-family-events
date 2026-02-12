@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Subscribe to Bmore Families | Free Weekly Baltimore Family Events",
+  title: "Subscribe | Free Weekly Baltimore Family Events",
   description:
     "Get the best family-friendly events in Baltimore delivered to your inbox every Thursday at 7am. 112+ sources, 5 parent personas, always free.",
   openGraph: {

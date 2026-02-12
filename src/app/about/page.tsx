@@ -3,7 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Bmore Families | How 5 Parent Personas Find Your Weekend",
+  title: "About | How 5 Parent Personas Find Your Weekend",
   description:
     "Built by a Baltimore dad tired of scrolling 20 websites. Learn how 5 AI parent personas gather family events from 112+ sources across 5 counties.",
   openGraph: {
