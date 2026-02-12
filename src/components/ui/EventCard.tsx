@@ -15,43 +15,43 @@ function formatDate(dateStr?: string): string {
   });
 }
 
-// Get badge color based on cost type
+// Get badge color based on cost type - using brand colors
 function getCostBadgeClass(costType?: string): string {
   switch (costType) {
     case "free":
-      return "bg-green-500 text-white font-bold"; // Prominent green for free
+      return "bg-[var(--color-seafoam)] text-[var(--color-boh)] font-bold"; // Seafoam for free
     case "donation":
-      return "bg-blue-100 text-blue-800";
+      return "bg-[var(--color-charm)]/10 text-[var(--color-charm)]";
     case "paid":
-      return "bg-[var(--card)] text-[var(--text)]";
+      return "bg-[var(--color-formstone)] text-[var(--text)]";
     default:
       return "bg-gray-100 text-gray-600";
   }
 }
 
-// Get category color for left border
+// Get category color for left border - using brand palette
 function getCategoryBorderColor(eventType?: string): string {
   switch (eventType) {
     case "museum":
-      return "border-l-purple-500";
+      return "border-l-[var(--color-agent-toddler)]"; // Purple
     case "outdoor":
-      return "border-l-green-500";
+      return "border-l-[var(--color-seafoam)]"; // Seafoam green
     case "performance":
-      return "border-l-pink-500";
+      return "border-l-[var(--color-agent-planner)]"; // Pink
     case "sports":
-      return "border-l-blue-500";
+      return "border-l-[var(--color-charm)]"; // Charm City Blue
     case "educational":
-      return "border-l-yellow-500";
+      return "border-l-[var(--color-calvert)]"; // Calvert Gold
     case "food":
-      return "border-l-orange-500";
+      return "border-l-[var(--color-crab)]"; // Crab Orange
     case "seasonal":
-      return "border-l-red-500";
+      return "border-l-[var(--color-crossland)]"; // Crossland Red
     case "class":
-      return "border-l-indigo-500";
+      return "border-l-[var(--color-agent-tween)]"; // Electric Blue
     case "camp":
-      return "border-l-teal-500";
+      return "border-l-[var(--color-seafoam)]"; // Seafoam
     default:
-      return "border-l-gray-300";
+      return "border-l-[var(--muted)]";
   }
 }
 
@@ -107,42 +107,49 @@ export default function EventCard({ event }: EventCardProps) {
   const linkUrl = event.registration_url || event.source_url;
 
   return (
-    <div className={`bg-white border border-[var(--muted)]/20 rounded-xl p-5 hover:shadow-lg transition-shadow border-l-4 ${getCategoryBorderColor(event.event_type)}`}>
+    <div className={`card group relative bg-white border border-[var(--muted)]/20 rounded-xl p-5 border-l-4 ${getCategoryBorderColor(event.event_type)} transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover`}>
+      {/* Subtle wave texture overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.02] pointer-events-none rounded-xl"
+        style={{ backgroundImage: "url('/brand/patterns/wave-single.svg')", backgroundSize: "200px" }}
+      />
+
       {/* Header with icon and date */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="relative flex items-start justify-between mb-3">
         <span className="text-2xl" aria-hidden="true">
           {getEventTypeIcon(event.event_type)}
         </span>
-        <span className="text-sm text-[var(--muted)]">
+        <span className="text-sm text-[var(--muted)] flex items-center gap-1">
+          <span className="text-[var(--color-crab)]">🦀</span>
           {formatDate(event.event_date_start)}
         </span>
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-[var(--text-dark)] mb-2 line-clamp-2">
+      <h3 className="relative text-lg font-semibold text-[var(--text-dark)] mb-2 line-clamp-2 group-hover:text-[var(--color-charm)] transition-colors duration-drift">
         {event.title}
       </h3>
 
       {/* Venue */}
       {event.venue && (
-        <p className="text-sm text-[var(--text)] mb-2 line-clamp-1">
+        <p className="relative text-sm text-[var(--text)] mb-2 line-clamp-1">
           📍 {event.venue}
         </p>
       )}
 
       {/* Time */}
       {event.event_time && (
-        <p className="text-sm text-[var(--muted)] mb-3">
+        <p className="relative text-sm text-[var(--muted)] mb-3">
           🕐 {event.event_time}
         </p>
       )}
 
       {/* Badges */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="relative flex flex-wrap gap-2 mb-4">
         {/* Cost badge - larger for free events */}
         {event.cost_type && (
           <span
-            className={`rounded-full font-medium ${
+            className={`badge rounded-full font-medium ${
               event.cost_type === "free"
                 ? "text-sm px-3 py-1.5 uppercase"
                 : "text-xs px-2 py-1"
@@ -154,16 +161,16 @@ export default function EventCard({ event }: EventCardProps) {
           </span>
         )}
 
-        {/* Age badge */}
+        {/* Age badge - using agent toddler purple */}
         {event.age_range_category && (
-          <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800 font-medium">
+          <span className="badge text-xs px-2 py-1 rounded-full bg-[var(--color-agent-toddler)]/10 text-[var(--color-agent-toddler)] font-medium">
             {getAgeLabel(event.age_range_category)}
           </span>
         )}
 
-        {/* Venue type badge */}
+        {/* Venue type badge - using charm blue */}
         {event.venue_type && event.venue_type !== "unknown" && (
-          <span className="text-xs px-2 py-1 rounded-full bg-sky-100 text-sky-800 font-medium">
+          <span className="badge text-xs px-2 py-1 rounded-full bg-[var(--color-charm)]/10 text-[var(--color-charm)] font-medium">
             {event.venue_type === "outdoor"
               ? "Outdoor"
               : event.venue_type === "indoor"
@@ -177,7 +184,7 @@ export default function EventCard({ event }: EventCardProps) {
 
       {/* Summary */}
       {event.summary && (
-        <p className="text-sm text-[var(--text)] mb-4 line-clamp-2">
+        <p className="relative text-sm text-[var(--text)] mb-4 line-clamp-2">
           {event.summary}
         </p>
       )}
@@ -188,9 +195,9 @@ export default function EventCard({ event }: EventCardProps) {
           href={linkUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center text-sm font-medium text-[var(--primary)] hover:underline"
+          className="relative inline-flex items-center text-sm font-medium text-[var(--color-crab)] hover:text-[var(--color-charm)] transition-colors duration-drift no-underline hover:no-underline"
         >
-          View Details →
+          View Details <span className="ml-1 group-hover:translate-x-1 transition-transform duration-drift">→</span>
         </a>
       )}
     </div>
