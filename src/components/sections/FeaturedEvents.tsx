@@ -131,7 +131,7 @@ export default function FeaturedEvents() {
           {events.map((event) => (
             <a
               key={event.id}
-              href={event.source_url || "#"}
+              href={event.original_event_url || event.registration_url || event.source_url || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-white border border-[var(--muted)]/20 rounded-xl p-5 transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover no-underline cursor-pointer"
