@@ -1,0 +1,7 @@
+<svg width="1440" height="200" viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Multiple wave layers for hero background -->
+  <path d="M0,40 Q180,10 360,40 T720,40 T1080,40 T1440,40" stroke="#0077B6" stroke-width="2" fill="none" opacity="0.1"/>
+  <path d="M0,80 Q180,50 360,80 T720,80 T1080,80 T1440,80" stroke="#0077B6" stroke-width="2" fill="none" opacity="0.15"/>
+  <path d="M0,120 Q180,90 360,120 T720,120 T1080,120 T1440,120" stroke="#0077B6" stroke-width="2" fill="none" opacity="0.1"/>
+  <path d="M0,160 Q180,130 360,160 T720,160 T1080,160 T1440,160" stroke="#0077B6" stroke-width="2" fill="none" opacity="0.08"/>
+</svg>

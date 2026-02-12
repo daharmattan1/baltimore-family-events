@@ -1,0 +1,14 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Maryland flag inspired crosshatch pattern (tileable) -->
+  <defs>
+    <pattern id="crosshatch" width="40" height="40" patternUnits="userSpaceOnUse">
+      <!-- Calvert gold diagonal lines -->
+      <line x1="0" y1="0" x2="40" y2="40" stroke="#FFB81C" stroke-width="1" opacity="0.3"/>
+      <line x1="40" y1="0" x2="0" y2="40" stroke="#FFB81C" stroke-width="1" opacity="0.3"/>
+      <!-- Optional Crossland red accent -->
+      <line x1="20" y1="0" x2="40" y2="20" stroke="#C41E3A" stroke-width="1" opacity="0.2"/>
+      <line x1="0" y1="20" x2="20" y2="40" stroke="#C41E3A" stroke-width="1" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="40" height="40" fill="url(#crosshatch)"/>
+</svg>
