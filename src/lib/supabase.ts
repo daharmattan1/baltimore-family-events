@@ -72,6 +72,7 @@ export interface BaltimoreEvent {
   family_friendly_score?: number;
   featured_worthy?: boolean;
   is_sold_out?: boolean;
+  moderation_status?: string;
 }
 
 // Filter options for the calendar
@@ -96,6 +97,7 @@ export async function fetchEvents(filters: EventFilters = {}) {
     .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
+    .in("moderation_status", ["auto_approved", "approved"])
     .order("event_date_start", { ascending: true });
 
   // Date range filter
@@ -167,6 +169,7 @@ export async function fetchFeaturedEvents(limit = 4) {
     .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
+    .in("moderation_status", ["auto_approved", "approved"])
     .eq("featured_worthy", true)
     .gte("event_date_start", today)
     .order("family_friendly_score", { ascending: false })
@@ -186,6 +189,7 @@ export async function fetchFeaturedEvents(limit = 4) {
     .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
+    .in("moderation_status", ["auto_approved", "approved"])
     .gte("event_date_start", today)
     .order("family_friendly_score", { ascending: false, nullsFirst: false })
     .order("event_date_start", { ascending: true })
