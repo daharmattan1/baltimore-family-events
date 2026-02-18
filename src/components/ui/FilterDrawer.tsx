@@ -5,20 +5,18 @@ import { useEffect, useRef, useCallback } from "react";
 interface FilterDrawerProps {
   isOpen: boolean;
   filters: {
-    eventType: string;
-    ageRange: string;
-    costType: string;
-    venueSourceCategory: string;
-    audienceOpenness: string;
-    locationArea: string;
+    eventType: string[];
+    ageRange: string[];
+    costType: string[];
+    locationArea: string[];
+    includeFaith: boolean;
   };
-  onFilterChange: (key: string, value: string) => void;
+  onFilterChange: (key: string, value: string[] | boolean) => void;
   onClearFilters: () => void;
   onClose: () => void;
 }
 
 const eventTypes = [
-  { value: "", label: "All Types" },
   { value: "museum", label: "Museum" },
   { value: "outdoor", label: "Outdoor" },
   { value: "performance", label: "Performance" },
@@ -31,7 +29,6 @@ const eventTypes = [
 ];
 
 const ageRanges = [
-  { value: "", label: "All Ages" },
   { value: "baby", label: "Baby (0-1)" },
   { value: "toddler", label: "Toddler (1-3)" },
   { value: "preschool", label: "Preschool (3-5)" },
@@ -42,32 +39,17 @@ const ageRanges = [
 ];
 
 const costTypes = [
-  { value: "", label: "Any Cost" },
   { value: "free", label: "Free" },
   { value: "donation", label: "Donation" },
   { value: "paid", label: "Paid" },
 ];
 
 const locationAreas = [
-  { value: "", label: "All Areas" },
   { value: "baltimore_city", label: "Baltimore City" },
   { value: "baltimore_county", label: "Baltimore County" },
   { value: "howard_county", label: "Howard County" },
   { value: "anne_arundel_county", label: "Anne Arundel County" },
   { value: "montgomery_county", label: "Montgomery County" },
-  { value: "other", label: "Other" },
-];
-
-const venueSourceCategories = [
-  { value: "", label: "All Venues" },
-  { value: "religious_institution", label: "Religious Institution" },
-  { value: "library", label: "Library" },
-  { value: "museum", label: "Museum" },
-  { value: "park_recreation", label: "Parks & Recreation" },
-  { value: "theater_venue", label: "Theater" },
-  { value: "school", label: "School" },
-  { value: "community_center", label: "Community Center" },
-  { value: "commercial", label: "Commercial" },
   { value: "other", label: "Other" },
 ];
 
@@ -97,15 +79,18 @@ export default function FilterDrawer({
   }, [isOpen, handleKeyDown]);
 
   const hasActiveFilters =
-    filters.eventType ||
-    filters.ageRange ||
-    filters.costType ||
-    filters.venueSourceCategory ||
-    filters.audienceOpenness ||
-    filters.locationArea;
+    filters.eventType.length > 0 ||
+    filters.ageRange.length > 0 ||
+    filters.costType.length > 0 ||
+    filters.locationArea.length > 0 ||
+    filters.includeFaith;
 
-  const showAudienceToggle =
-    filters.venueSourceCategory === "religious_institution";
+  const toggleArrayValue = (key: string, currentValues: string[], value: string) => {
+    const next = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    onFilterChange(key, next);
+  };
 
   if (!isOpen) return null;
 
@@ -139,90 +124,63 @@ export default function FilterDrawer({
 
         {/* Content */}
         <div className="overflow-y-auto p-4 sm:p-5" style={{ maxHeight: "calc(70vh - 80px)" }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Event Type */}
-            <SelectField
-              id="drawer-eventType"
+            <CheckboxGroup
               label="Event Type"
-              value={filters.eventType}
               options={eventTypes}
-              onChange={(v) => onFilterChange("eventType", v)}
+              selected={filters.eventType}
+              onToggle={(v) => toggleArrayValue("eventType", filters.eventType, v)}
             />
 
             {/* Age Group */}
-            <SelectField
-              id="drawer-ageRange"
+            <CheckboxGroup
               label="Age Group"
-              value={filters.ageRange}
               options={ageRanges}
-              onChange={(v) => onFilterChange("ageRange", v)}
+              selected={filters.ageRange}
+              onToggle={(v) => toggleArrayValue("ageRange", filters.ageRange, v)}
             />
 
             {/* Cost */}
-            <SelectField
-              id="drawer-costType"
+            <CheckboxGroup
               label="Cost"
-              value={filters.costType}
               options={costTypes}
-              onChange={(v) => onFilterChange("costType", v)}
+              selected={filters.costType}
+              onToggle={(v) => toggleArrayValue("costType", filters.costType, v)}
             />
 
             {/* Location */}
-            <SelectField
-              id="drawer-locationArea"
+            <CheckboxGroup
               label="County / Area"
-              value={filters.locationArea}
               options={locationAreas}
-              onChange={(v) => onFilterChange("locationArea", v)}
+              selected={filters.locationArea}
+              onToggle={(v) => toggleArrayValue("locationArea", filters.locationArea, v)}
             />
+          </div>
 
-            {/* Venue Type */}
-            <SelectField
-              id="drawer-venueSourceCategory"
-              label="Venue Type"
-              value={filters.venueSourceCategory}
-              options={venueSourceCategories}
-              onChange={(v) => {
-                onFilterChange("venueSourceCategory", v);
-                // Clear audience filter when venue type changes away from religious
-                if (v !== "religious_institution") {
-                  onFilterChange("audienceOpenness", "");
-                }
-              }}
-            />
-
-            {/* Audience toggle — only when Religious Institution selected */}
-            {showAudienceToggle && (
-              <div className="w-full">
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Audience
-                </label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => onFilterChange("audienceOpenness", "")}
-                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                      !filters.audienceOpenness
-                        ? "bg-[var(--color-calvert)] text-[var(--color-boh)] shadow-sm"
-                        : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-calvert)]/10"
-                    }`}
-                  >
-                    Include All
-                  </button>
-                  <button
-                    onClick={() =>
-                      onFilterChange("audienceOpenness", "open_to_all")
-                    }
-                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                      filters.audienceOpenness === "open_to_all"
-                        ? "bg-[var(--color-calvert)] text-[var(--color-boh)] shadow-sm"
-                        : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-calvert)]/10"
-                    }`}
-                  >
-                    Open to All Only
-                  </button>
-                </div>
+          {/* Faith & Community Toggle */}
+          <div className="mt-5 pt-4 border-t border-[var(--muted)]/20">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div
+                className={`relative w-11 h-6 rounded-full transition-colors duration-150 ${
+                  filters.includeFaith
+                    ? "bg-[var(--color-calvert)]"
+                    : "bg-[var(--muted)]/30"
+                }`}
+                onClick={() => onFilterChange("includeFaith", !filters.includeFaith)}
+                role="switch"
+                aria-checked={filters.includeFaith}
+              >
+                <div
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-150 ${
+                    filters.includeFaith ? "translate-x-5" : ""
+                  }`}
+                />
               </div>
-            )}
+              <span className="text-sm font-medium text-[var(--text)] group-hover:text-[var(--color-boh)]">
+                Include Faith & Community Events
+              </span>
+            </label>
           </div>
         </div>
 
@@ -233,7 +191,7 @@ export default function FilterDrawer({
               onClick={onClearFilters}
               className="text-sm text-[var(--color-charm)] hover:underline font-medium"
             >
-              Clear All
+              Clear All Filters
             </button>
           ) : (
             <div />
@@ -250,39 +208,40 @@ export default function FilterDrawer({
   );
 }
 
-function SelectField({
-  id,
+function CheckboxGroup({
   label,
-  value,
   options,
-  onChange,
+  selected,
+  onToggle,
 }: {
-  id: string;
   label: string;
-  value: string;
   options: { value: string; label: string }[];
-  onChange: (value: string) => void;
+  selected: string[];
+  onToggle: (value: string) => void;
 }) {
   return (
-    <div className="w-full">
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-[var(--text)] mb-1"
-      >
+    <fieldset>
+      <legend className="block text-sm font-medium text-[var(--text)] mb-2">
         {label}
-      </label>
-      <select
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 bg-white border border-[var(--muted)]/30 rounded-lg text-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-charm)]/50"
-      >
+      </legend>
+      <div className="space-y-1.5">
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
+          <label
+            key={opt.value}
+            className="flex items-center gap-2 cursor-pointer group"
+          >
+            <input
+              type="checkbox"
+              checked={selected.includes(opt.value)}
+              onChange={() => onToggle(opt.value)}
+              className="w-4 h-4 rounded border-[var(--muted)]/40 text-[var(--color-charm)] focus:ring-[var(--color-charm)]/50 accent-[var(--color-charm)]"
+            />
+            <span className="text-sm text-[var(--color-harbor)] group-hover:text-[var(--color-boh)]">
+              {opt.label}
+            </span>
+          </label>
         ))}
-      </select>
-    </div>
+      </div>
+    </fieldset>
   );
 }

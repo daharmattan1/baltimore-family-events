@@ -18,12 +18,11 @@ export default function CalendarPage() {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [filters, setFilters] = useState({
-    eventType: "",
-    ageRange: "",
-    costType: "",
-    venueSourceCategory: "",
-    audienceOpenness: "",
-    locationArea: "",
+    eventType: [] as string[],
+    ageRange: [] as string[],
+    costType: [] as string[],
+    locationArea: [] as string[],
+    includeFaith: false,
   });
   const [dateFilter, setDateFilter] = useState("");
   const [showDrawer, setShowDrawer] = useState(false);
@@ -48,12 +47,11 @@ export default function CalendarPage() {
 
     try {
       const params = new URLSearchParams();
-      if (filters.eventType) params.set("eventType", filters.eventType);
-      if (filters.ageRange) params.set("ageRange", filters.ageRange);
-      if (filters.costType) params.set("costType", filters.costType);
-      if (filters.venueSourceCategory) params.set("venueSourceCategory", filters.venueSourceCategory);
-      if (filters.audienceOpenness) params.set("audienceOpenness", filters.audienceOpenness);
-      if (filters.locationArea) params.set("locationArea", filters.locationArea);
+      if (filters.eventType.length > 0) params.set("eventType", filters.eventType.join(","));
+      if (filters.ageRange.length > 0) params.set("ageRange", filters.ageRange.join(","));
+      if (filters.costType.length > 0) params.set("costType", filters.costType.join(","));
+      if (filters.locationArea.length > 0) params.set("locationArea", filters.locationArea.join(","));
+      if (filters.includeFaith) params.set("includeFaith", "true");
 
       if (viewMode === "calendar") {
         // In calendar view, fetch the entire displayed month
@@ -98,13 +96,13 @@ export default function CalendarPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, viewMode]);
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key: string, value: string[] | boolean) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setVisibleCount(12);
   };
 
   const handleClearFilters = () => {
-    setFilters({ eventType: "", ageRange: "", costType: "", venueSourceCategory: "", audienceOpenness: "", locationArea: "" });
+    setFilters({ eventType: [], ageRange: [], costType: [], locationArea: [], includeFaith: false });
     setDateFilter("");
     setVisibleCount(12);
   };
@@ -220,6 +218,7 @@ export default function CalendarPage() {
             onFilterChange={handleFilterChange}
             onDateFilterChange={handleDateFilter}
             onToggleDrawer={() => setShowDrawer((prev) => !prev)}
+            onClearFilters={handleClearFilters}
             isDrawerOpen={showDrawer}
           />
         </div>

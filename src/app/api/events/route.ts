@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ events, count: events.length });
     }
 
-    // Build filters from query params
+    // Build filters from query params (supports comma-separated multi-select)
     const filters: EventFilters = {};
 
     const startDate = searchParams.get("startDate");
@@ -22,18 +22,16 @@ export async function GET(request: NextRequest) {
     const ageRange = searchParams.get("ageRange");
     const costType = searchParams.get("costType");
     const locationArea = searchParams.get("locationArea");
-    const venueSourceCategory = searchParams.get("venueSourceCategory");
-    const audienceOpenness = searchParams.get("audienceOpenness");
+    const includeFaith = searchParams.get("includeFaith");
     const limit = searchParams.get("limit");
 
     if (startDate) filters.startDate = startDate;
     if (endDate) filters.endDate = endDate;
-    if (eventType) filters.eventType = eventType;
-    if (ageRange) filters.ageRange = ageRange;
-    if (costType) filters.costType = costType;
-    if (locationArea) filters.locationArea = locationArea;
-    if (venueSourceCategory) filters.venueSourceCategory = venueSourceCategory;
-    if (audienceOpenness) filters.audienceOpenness = audienceOpenness;
+    if (eventType) filters.eventType = eventType.split(",");
+    if (ageRange) filters.ageRange = ageRange.split(",");
+    if (costType) filters.costType = costType.split(",");
+    if (locationArea) filters.locationArea = locationArea.split(",");
+    if (includeFaith === "true") filters.includeFaith = true;
     if (limit) filters.limit = parseInt(limit);
 
     const events = await fetchEvents(filters);

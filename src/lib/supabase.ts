@@ -75,16 +75,15 @@ export interface BaltimoreEvent {
   moderation_status?: string;
 }
 
-// Filter options for the calendar
+// Filter options for the calendar (multi-select arrays)
 export interface EventFilters {
   startDate?: string;
   endDate?: string;
-  eventType?: string;
-  ageRange?: string;
-  costType?: string;
-  locationArea?: string;
-  venueSourceCategory?: string;
-  audienceOpenness?: string;
+  eventType?: string[];
+  ageRange?: string[];
+  costType?: string[];
+  locationArea?: string[];
+  includeFaith?: boolean;
   limit?: number;
 }
 
@@ -112,32 +111,25 @@ export async function fetchEvents(filters: EventFilters = {}) {
     query = query.lte("event_date_start", filters.endDate);
   }
 
-  // Category filters
-  if (filters.eventType) {
-    query = query.eq("event_type", filters.eventType);
+  // Category filters (multi-select: use .in() for arrays)
+  if (filters.eventType && filters.eventType.length > 0) {
+    query = query.in("event_type", filters.eventType);
   }
 
-  if (filters.ageRange) {
-    query = query.eq("age_range_category", filters.ageRange);
+  if (filters.ageRange && filters.ageRange.length > 0) {
+    query = query.in("age_range_category", filters.ageRange);
   }
 
-  if (filters.costType) {
-    query = query.eq("cost_type", filters.costType);
+  if (filters.costType && filters.costType.length > 0) {
+    query = query.in("cost_type", filters.costType);
   }
 
-  if (filters.locationArea) {
-    query = query.eq("location_area", filters.locationArea);
+  if (filters.locationArea && filters.locationArea.length > 0) {
+    query = query.in("location_area", filters.locationArea);
   }
 
-  if (filters.venueSourceCategory) {
-    query = query.eq("venue_source_category", filters.venueSourceCategory);
-  }
-
-  // Default: exclude faith_community events unless explicitly requested
-  if (filters.audienceOpenness) {
-    query = query.eq("audience_openness", filters.audienceOpenness);
-  } else if (!filters.venueSourceCategory) {
-    // When not filtering by venue source, hide faith_community events
+  // Faith & Community toggle: when OFF (default), exclude faith_community events
+  if (!filters.includeFaith) {
     query = query.or("audience_openness.is.null,audience_openness.eq.open_to_all");
   }
 
@@ -160,11 +152,13 @@ export async function fetchEvents(filters: EventFilters = {}) {
 
 // Fetch featured events for homepage
 // First tries featured_worthy=true, falls back to highest scoring events
+// Only shows events within the next 7 days
 export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
   const today = new Date().toISOString().split("T")[0];
+  const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-  // First try to get events marked as featured
+  // First try to get events marked as featured (within next 7 days)
   const { data: featuredData, error: featuredError } = await supabase
     .from("baltimore_events")
     .select("*")
@@ -172,6 +166,7 @@ export async function fetchFeaturedEvents(limit = 4) {
     .in("moderation_status", ["auto_approved", "approved"])
     .eq("featured_worthy", true)
     .gte("event_date_start", today)
+    .lte("event_date_start", nextWeek)
     .order("family_friendly_score", { ascending: false })
     .limit(limit);
 
@@ -184,13 +179,14 @@ export async function fetchFeaturedEvents(limit = 4) {
     return featuredData as BaltimoreEvent[];
   }
 
-  // Fall back to highest-scoring events if no/few featured ones
+  // Fall back to highest-scoring events within next 7 days
   const { data: topData, error: topError } = await supabase
     .from("baltimore_events")
     .select("*")
     .eq("is_relevant", true)
     .in("moderation_status", ["auto_approved", "approved"])
     .gte("event_date_start", today)
+    .lte("event_date_start", nextWeek)
     .order("family_friendly_score", { ascending: false, nullsFirst: false })
     .order("event_date_start", { ascending: true })
     .limit(limit);

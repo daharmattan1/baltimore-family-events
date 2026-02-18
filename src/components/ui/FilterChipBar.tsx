@@ -2,18 +2,18 @@
 
 interface FilterChipBarProps {
   filters: {
-    eventType: string;
-    ageRange: string;
-    costType: string;
-    venueSourceCategory: string;
-    audienceOpenness: string;
-    locationArea: string;
+    eventType: string[];
+    ageRange: string[];
+    costType: string[];
+    locationArea: string[];
+    includeFaith: boolean;
   };
   dateFilter: string;
-  viewMode: "list" | "calendar";
-  onFilterChange: (key: string, value: string) => void;
+  viewMode: "list" | "calendar" | "weekends";
+  onFilterChange: (key: string, value: string[] | boolean) => void;
   onDateFilterChange: (preset: string) => void;
   onToggleDrawer: () => void;
+  onClearFilters: () => void;
   isDrawerOpen: boolean;
 }
 
@@ -24,14 +24,25 @@ export default function FilterChipBar({
   onFilterChange,
   onDateFilterChange,
   onToggleDrawer,
+  onClearFilters,
   isDrawerOpen,
 }: FilterChipBarProps) {
-  // Count active filters in the drawer (excludes chips that have their own toggle)
-  const drawerFilterCount = [
-    filters.eventType,
-    filters.ageRange,
-    filters.locationArea,
-  ].filter(Boolean).length;
+  // Count active filters in the drawer
+  const activeFilterCount =
+    filters.eventType.length +
+    filters.ageRange.length +
+    filters.costType.length +
+    filters.locationArea.length +
+    (filters.includeFaith ? 1 : 0);
+
+  const hasAnyFilter = activeFilterCount > 0 || dateFilter;
+
+  const toggleChipArray = (key: string, currentValues: string[], value: string) => {
+    const next = currentValues.includes(value)
+      ? currentValues.filter((v) => v !== value)
+      : [...currentValues, value];
+    onFilterChange(key, next);
+  };
 
   return (
     <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 -mx-1 px-1">
@@ -63,45 +74,26 @@ export default function FilterChipBar({
       {/* Quick filter chips */}
       <ChipButton
         label="Free"
-        active={filters.costType === "free"}
-        onClick={() =>
-          onFilterChange("costType", filters.costType === "free" ? "" : "free")
-        }
+        active={filters.costType.includes("free")}
+        onClick={() => toggleChipArray("costType", filters.costType, "free")}
         activeColor="bg-[var(--color-seafoam)] text-[var(--color-boh)]"
       />
       <ChipButton
         label="Ages 0-4"
-        active={filters.ageRange === "toddler"}
-        onClick={() =>
-          onFilterChange(
-            "ageRange",
-            filters.ageRange === "toddler" ? "" : "toddler"
-          )
-        }
+        active={filters.ageRange.includes("toddler")}
+        onClick={() => toggleChipArray("ageRange", filters.ageRange, "toddler")}
         activeColor="bg-[var(--color-agent-toddler)] text-white"
       />
       <ChipButton
         label="Outdoor"
-        active={filters.eventType === "outdoor"}
-        onClick={() =>
-          onFilterChange(
-            "eventType",
-            filters.eventType === "outdoor" ? "" : "outdoor"
-          )
-        }
+        active={filters.eventType.includes("outdoor")}
+        onClick={() => toggleChipArray("eventType", filters.eventType, "outdoor")}
         activeColor="bg-[var(--color-seafoam)] text-[var(--color-boh)]"
       />
       <ChipButton
         label="Faith & Community"
-        active={filters.venueSourceCategory === "religious_institution"}
-        onClick={() =>
-          onFilterChange(
-            "venueSourceCategory",
-            filters.venueSourceCategory === "religious_institution"
-              ? ""
-              : "religious_institution"
-          )
-        }
+        active={filters.includeFaith}
+        onClick={() => onFilterChange("includeFaith", !filters.includeFaith)}
         activeColor="bg-[var(--color-calvert)] text-[var(--color-boh)]"
       />
 
@@ -109,15 +101,15 @@ export default function FilterChipBar({
       <button
         onClick={onToggleDrawer}
         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-150 flex-shrink-0 ${
-          isDrawerOpen || drawerFilterCount > 0
+          isDrawerOpen || activeFilterCount > 0
             ? "bg-[var(--color-charm)] text-white shadow-sm"
             : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
         }`}
       >
         More Filters
-        {drawerFilterCount > 0 && (
+        {activeFilterCount > 0 && (
           <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-white/30">
-            {drawerFilterCount}
+            {activeFilterCount}
           </span>
         )}
         <svg
@@ -136,6 +128,28 @@ export default function FilterChipBar({
           />
         </svg>
       </button>
+
+      {/* Clear All Filters button — visible when any filter is active */}
+      {hasAnyFilter && (
+        <>
+          <div className="w-px h-6 bg-[var(--muted)]/30 flex-shrink-0" />
+          <button
+            onClick={onClearFilters}
+            className="flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-[var(--color-charm)] hover:bg-[var(--color-charm)]/10 transition-all duration-150 flex-shrink-0"
+          >
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear All
+          </button>
+        </>
+      )}
     </div>
   );
 }
