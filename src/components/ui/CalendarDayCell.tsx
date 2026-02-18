@@ -10,6 +10,22 @@ interface CalendarDayCellProps {
   onClick: () => void;
 }
 
+function getBadgeClasses(eventCount: number, isSelected: boolean): string {
+  if (isSelected) {
+    return "bg-white text-[var(--color-charm)]";
+  }
+  if (eventCount >= 16) {
+    // Dense: large Crab Orange badge
+    return "bg-[var(--color-crab)] text-white min-w-[22px] h-[22px] text-[11px]";
+  }
+  if (eventCount >= 6) {
+    // Medium: bolder badge
+    return "bg-[var(--color-crab)]/80 text-white min-w-[20px] h-[20px] text-[11px]";
+  }
+  // Light: small muted
+  return "bg-[var(--color-crab)] text-white min-w-[18px] h-[18px] text-[10px]";
+}
+
 export default function CalendarDayCell({
   dayNumber,
   eventCount,
@@ -55,17 +71,13 @@ export default function CalendarDayCell({
         {dayNumber}
       </span>
 
-      {/* Event count badge */}
+      {/* Event count badge — tiered density */}
       {eventCount > 0 && isCurrentMonth && (
         <span
           className={`
             mt-0.5 flex items-center justify-center
-            min-w-[18px] h-[18px] rounded-full
-            text-[10px] font-bold leading-none px-1
-            ${isSelected
-              ? "bg-white text-[var(--color-charm)]"
-              : "bg-[var(--color-crab)] text-white"
-            }
+            rounded-full font-bold leading-none px-1
+            ${getBadgeClasses(eventCount, isSelected)}
           `}
         >
           {eventCount}

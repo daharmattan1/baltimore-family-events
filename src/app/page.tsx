@@ -1,12 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import FeaturedEvents from "@/components/sections/FeaturedEvents";
+import SourceDepthGrid from "@/components/sections/SourceDepthGrid";
+import AgentPersonaSection from "@/components/sections/AgentPersonaSection";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Bmore Families | AI-Curated Baltimore Family Events Every Week",
   description:
-    "Stop scrolling 20 websites. Get the best family events in Baltimore delivered Thursday. 112+ sources, 5 counties, 5 parent personas. Free forever.",
+    "Stop scrolling 193 websites. Get the best family events in Baltimore delivered Thursday. 193 sources, 5 counties, 5 parent personas + 1 real dad. Free forever.",
   keywords: [
     "Baltimore family events",
     "things to do with kids Baltimore",
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Bmore Families | Your Weekend, Sorted",
     description:
-      "AI-curated family events from 112+ sources across 5 Baltimore counties. Free weekly newsletter.",
+      "AI-curated family events from 193 sources across 5 Baltimore counties. Free weekly newsletter.",
     type: "website",
     locale: "en_US",
     siteName: "Bmore Families",
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Bmore Families | Your Weekend, Sorted",
     description:
-      "Stop scrolling 20 websites. Get the best family events in Baltimore delivered every Thursday.",
+      "Stop scrolling 193 websites. Get the best family events in Baltimore delivered every Thursday.",
   },
 };
 
@@ -68,9 +70,9 @@ export default function Home() {
           </h1>
 
           <p className="font-body text-lg sm:text-xl text-[var(--color-harbor)] max-w-2xl mx-auto mb-10 leading-relaxed">
-            112+ sources. 5 counties. 5 parent personas picking the gems.
+            193 sources and growing. 5 counties. 5 AI parent personas and one real dad picking the gems.
             <br className="hidden sm:block" />
-            The best family events, delivered every Thursday morning.
+            Browse the calendar anytime, or get the best picks delivered every Thursday.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -90,7 +92,7 @@ export default function Home() {
 
           {/* Trust indicator */}
           <p className="mt-8 text-sm text-[var(--muted)]">
-            🦀 Free forever • Unsubscribe anytime • Made in Baltimore
+            Free forever · Unsubscribe anytime · Made in Baltimore
           </p>
         </div>
 
@@ -109,8 +111,11 @@ export default function Home() {
       {/* Featured Events - Real data from Supabase */}
       <FeaturedEvents />
 
+      {/* Source Depth Grid - What We Cover */}
+      <SourceDepthGrid />
+
       {/* How It Works - Branded */}
-      <section className="relative py-20 bg-[var(--color-formstone)]">
+      <section className="relative py-20 bg-white">
         {/* Subtle crosshatch pattern */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -124,34 +129,34 @@ export default function Home() {
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-4 text-center">
             How It Works
           </h2>
-          <p className="text-center text-[var(--color-harbor)] mb-12 max-w-xl mx-auto">
-            Think of it like five different parents scouring the harbor for your perfect weekend.
+          <p className="text-center text-[var(--color-harbor)] mb-12 max-w-2xl mx-auto">
+            You could check 193 websites yourself. Or you could let five AI parents and one real dad do it for you.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--color-charm)] rounded-2xl flex items-center justify-center text-white font-display font-bold text-2xl mx-auto mb-5 shadow-charm">
+              <div className="w-16 h-16 bg-[var(--color-charm)] rounded-2xl flex items-center justify-center text-white font-display font-bold text-2xl mx-auto mb-5">
                 1
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                We Gather
+                We Scan Everything
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Every week, we scan 112+ sources across 5 counties to catch every family event worth knowing about.
+                Every week, we pull from 193 sources across 5 counties — museums, swim schools, libraries, parks, synagogues, churches, farms, and 21 Facebook and Reddit groups where local parents share what they&apos;ve actually tried.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--color-crab)] rounded-2xl flex items-center justify-center text-white font-display font-bold text-2xl mx-auto mb-5 shadow-crab">
+              <div className="w-16 h-16 bg-[var(--color-crab)] rounded-2xl flex items-center justify-center text-white font-display font-bold text-2xl mx-auto mb-5">
                 2
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                5 Parents Pick
+                Five Parents Pick the Gems
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Five AI parent personas evaluate every event — asking the questions real parents ask.
+                Each event gets reviewed by five AI parent personas. Sarah asks &ldquo;Is this worth leaving the house for?&rdquo; Marcus checks the true cost. Jamie maps the nap-time escape routes. David filters for tween-level cool. Christina flags what you need to book now.
               </p>
             </div>
 
@@ -161,73 +166,18 @@ export default function Home() {
                 3
               </div>
               <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-3">
-                You Explore
+                You Pick Your Path
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Thursday morning, the best 5-7 events land in your inbox. Open, pick one, go.
+                Browse the live calendar anytime to find what fits your weekend. Or subscribe for free and get the top 5-7 picks delivered to your inbox every Thursday morning — already sorted, already vetted, ready to go.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Agent Personas Teaser */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-4 text-center">
-            Meet Your Weekend Crew
-          </h2>
-          <p className="text-center text-[var(--color-harbor)] mb-12 max-w-xl mx-auto">
-            Five parent personas, each with a different take on what makes a great family outing.
-          </p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {/* Weekend Warrior */}
-            <div className="text-center p-4 rounded-xl bg-[var(--color-crab)]/5 border border-[var(--color-crab)]/20">
-              <div className="text-3xl mb-2">🏃</div>
-              <h4 className="font-semibold text-[var(--color-crab)] text-sm">Weekend Warrior</h4>
-              <p className="text-xs text-[var(--muted)] mt-1">Active adventures</p>
-            </div>
-
-            {/* Budget-Conscious */}
-            <div className="text-center p-4 rounded-xl bg-[var(--color-agent-budget)]/5 border border-[var(--color-agent-budget)]/20">
-              <div className="text-3xl mb-2">💰</div>
-              <h4 className="font-semibold text-[var(--color-agent-budget)] text-sm">Budget Pro</h4>
-              <p className="text-xs text-[var(--muted)] mt-1">Free & affordable</p>
-            </div>
-
-            {/* Toddler Wrangler */}
-            <div className="text-center p-4 rounded-xl bg-[var(--color-agent-toddler)]/5 border border-[var(--color-agent-toddler)]/20">
-              <div className="text-3xl mb-2">👶</div>
-              <h4 className="font-semibold text-[var(--color-agent-toddler)] text-sm">Toddler Expert</h4>
-              <p className="text-xs text-[var(--muted)] mt-1">Little ones</p>
-            </div>
-
-            {/* Tween Entertainer */}
-            <div className="text-center p-4 rounded-xl bg-[var(--color-agent-tween)]/5 border border-[var(--color-agent-tween)]/20">
-              <div className="text-3xl mb-2">🎮</div>
-              <h4 className="font-semibold text-[var(--color-agent-tween)] text-sm">Tween Finder</h4>
-              <p className="text-xs text-[var(--muted)] mt-1">Older kids</p>
-            </div>
-
-            {/* Plan-Ahead */}
-            <div className="text-center p-4 rounded-xl bg-[var(--color-agent-planner)]/5 border border-[var(--color-agent-planner)]/20 col-span-2 sm:col-span-1">
-              <div className="text-3xl mb-2">📅</div>
-              <h4 className="font-semibold text-[var(--color-agent-planner)] text-sm">Planner</h4>
-              <p className="text-xs text-[var(--muted)] mt-1">Coming soon</p>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <Link
-              href="/about"
-              className="text-[var(--color-charm)] font-medium hover:text-[var(--color-crab)] transition-colors no-underline hover:no-underline"
-            >
-              Learn how our AI curation works →
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Agent Personas - Rich Cards */}
+      <AgentPersonaSection />
 
       {/* Newsletter CTA - Full Brand Treatment */}
       <section className="relative py-20 bg-[var(--color-boh)] text-white overflow-hidden">
@@ -242,12 +192,12 @@ export default function Home() {
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
-            Stop Scrolling. Start Exploring.
+            193 Sources. One Thursday Email.
           </h2>
           <p className="text-gray-300 mb-8 text-lg">
-            Baltimore families are discovering weekend gems every Thursday morning.
+            You&apos;re not going to check 193 websites every week. We already did.
             <br />
-            Free forever. Unsubscribe anytime. Built by a local dad.
+            Free forever. Unsubscribe anytime. Built by a Baltimore dad who got tired of Googling.
           </p>
           <Link
             href="/subscribe"

@@ -27,6 +27,7 @@ export default function CalendarPage() {
   });
   const [dateFilter, setDateFilter] = useState("");
   const [showDrawer, setShowDrawer] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const {
     selectedDay,
@@ -99,11 +100,13 @@ export default function CalendarPage() {
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setVisibleCount(12);
   };
 
   const handleClearFilters = () => {
     setFilters({ eventType: "", ageRange: "", costType: "", venueSourceCategory: "", audienceOpenness: "", locationArea: "" });
     setDateFilter("");
+    setVisibleCount(12);
   };
 
   const handleViewChange = (mode: "list" | "calendar") => {
@@ -154,6 +157,7 @@ export default function CalendarPage() {
 
   const handleDateFilter = (preset: string) => {
     setDateFilter((prev) => (prev === preset ? "" : preset));
+    setVisibleCount(12);
   };
 
   return (
@@ -302,13 +306,23 @@ export default function CalendarPage() {
           <>
             <p className="text-sm text-[var(--muted)] mb-4 flex items-center gap-2">
               <span className="text-[var(--color-crab)]">🦀</span>
-              Showing {events.length} event{events.length !== 1 ? "s" : ""}
+              Showing {Math.min(visibleCount, events.length)} of {events.length} event{events.length !== 1 ? "s" : ""}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event) => (
+              {events.slice(0, visibleCount).map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
+            {visibleCount < events.length && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 12)}
+                  className="btn btn-secondary"
+                >
+                  Show 12 more
+                </button>
+              </div>
+            )}
           </>
         )}
 

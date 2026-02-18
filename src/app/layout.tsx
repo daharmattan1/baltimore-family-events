@@ -15,12 +15,12 @@ export const metadata: Metadata = {
     template: "%s | Bmore Families",
   },
   description:
-    "Discover the best family-friendly events in Baltimore. AI-curated from 112+ sources across 5 counties. Free weekly newsletter every Thursday.",
+    "Discover the best family-friendly events in Baltimore. AI-curated from 193 sources across 5 counties. Free weekly newsletter every Thursday.",
   metadataBase: new URL("https://bmorefamilies.com"),
   openGraph: {
     title: "Bmore Families | Your Weekend, Sorted",
     description:
-      "AI-curated family events from 112+ sources across 5 Baltimore counties. Free weekly newsletter.",
+      "AI-curated family events from 193 sources across 5 Baltimore counties. Free weekly newsletter.",
     type: "website",
     locale: "en_US",
     siteName: "Bmore Families",
