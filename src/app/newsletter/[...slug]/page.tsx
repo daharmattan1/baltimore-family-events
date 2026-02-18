@@ -24,10 +24,10 @@ export async function generateMetadata({
 
   return {
     title: `${newsletter.title} | BmoreFamilies`,
-    description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. AI-curated picks from 112+ sources across 5 counties.`,
+    description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. AI-curated picks from 193 sources across 5 counties.`,
     openGraph: {
       title: newsletter.title,
-      description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. Curated from 112+ sources.`,
+      description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. Curated from 193 sources.`,
     },
   };
 }

@@ -166,3 +166,54 @@ export function groupEventsByDate(
   }
   return grouped;
 }
+
+// Group events by event_type for dense day drawer categorization
+export function groupEventsByType(
+  events: BaltimoreEvent[]
+): Map<string, BaltimoreEvent[]> {
+  const grouped = new Map<string, BaltimoreEvent[]>();
+  for (const event of events) {
+    const typeKey = event.event_type || "other";
+    const existing = grouped.get(typeKey) || [];
+    existing.push(event);
+    grouped.set(typeKey, existing);
+  }
+  // Sort events within each group by family_friendly_score descending
+  for (const [key, group] of grouped) {
+    grouped.set(
+      key,
+      group.sort(
+        (a, b) => (b.family_friendly_score ?? 0) - (a.family_friendly_score ?? 0)
+      )
+    );
+  }
+  return grouped;
+}
+
+// Get human-readable label for event_type
+export function getEventTypeLabel(eventType: string): string {
+  switch (eventType) {
+    case "museum":
+      return "Museums & Attractions";
+    case "outdoor":
+      return "Parks & Nature";
+    case "performance":
+      return "Theaters & Performance";
+    case "sports":
+      return "Sports & Fitness";
+    case "educational":
+      return "Educational";
+    case "food":
+      return "Food & Dining";
+    case "seasonal":
+      return "Seasonal & Holiday";
+    case "class":
+      return "Classes & Workshops";
+    case "camp":
+      return "Camps & Programs";
+    case "other":
+      return "Other Events";
+    default:
+      return eventType.charAt(0).toUpperCase() + eventType.slice(1);
+  }
+}

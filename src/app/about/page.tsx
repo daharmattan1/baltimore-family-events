@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About | How 5 Parent Personas Find Your Weekend",
   description:
-    "Built by a Baltimore dad tired of scrolling 20 websites. Learn how 5 AI parent personas gather family events from 112+ sources across 5 counties.",
+    "Built by a Baltimore dad tired of scrolling 193 websites. Learn how 5 AI parent personas gather family events from 193 sources across 5 counties.",
   openGraph: {
     title: "About Bmore Families",
     description:
@@ -95,7 +95,7 @@ export default function AboutPage() {
                 <p className="text-[var(--color-harbor)] mb-4 leading-relaxed">
                   After 15 years scaling tech companies — including building <strong className="text-[var(--color-boh)]">BurnAlong
                   right here in Baltimore</strong> — I realized I could fix this. The same systems I use to
-                  gather intelligence for businesses now scan 112+ sources every week. Five AI parent personas
+                  gather intelligence for businesses now scan 193 sources every week. Five AI parent personas
                   evaluate every event, asking the questions real parents ask: &quot;Can we actually do this
                   with a toddler?&quot; &quot;Is it worth the drive?&quot; &quot;What&apos;s it really cost?&quot;
                 </p>
@@ -273,7 +273,7 @@ export default function AboutPage() {
           </h2>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-[var(--color-charm)]/5 rounded-2xl p-6 text-center border border-[var(--color-charm)]/10">
-              <div className="text-4xl font-display font-bold text-[var(--color-charm)]">112+</div>
+              <div className="text-4xl font-display font-bold text-[var(--color-charm)]">193</div>
               <div className="text-[var(--color-harbor)] text-sm mt-1">Sources Scanned</div>
             </div>
             <div className="bg-[var(--color-crab)]/5 rounded-2xl p-6 text-center border border-[var(--color-crab)]/10">

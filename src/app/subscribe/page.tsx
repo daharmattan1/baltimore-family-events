@@ -67,7 +67,7 @@ export default function SubscribePage() {
           </h1>
           <p className="text-lg text-[var(--color-harbor)] max-w-xl mx-auto">
             The best 5-7 family events for THIS weekend, delivered Thursday at 7am.
-            112+ sources. Zero scrolling. Always free.
+            193 sources. Zero scrolling. Always free.
           </p>
         </div>
 
