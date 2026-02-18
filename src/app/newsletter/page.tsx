@@ -9,18 +9,6 @@ export const metadata: Metadata = {
     "Browse past issues of the Bmore Families weekly newsletter. AI-curated family events across 5 Baltimore counties.",
 };
 
-// Format date for display
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 // Extract a preview snippet from newsletter content
 function getPreviewSnippet(content: string): string {
   // Remove markdown formatting and get first ~150 chars
@@ -110,10 +98,11 @@ export default function NewsletterPage() {
                     <h2 className="text-lg font-display font-semibold text-[var(--color-boh)] mb-1">
                       {newsletter.title}
                     </h2>
-                    <p className="text-sm text-[var(--muted)]">
-                      {newsletter.dateRange && <span>{newsletter.dateRange} · </span>}
-                      Published {formatDate(newsletter.generated)}
-                    </p>
+                    {newsletter.dateRange && (
+                      <p className="text-sm text-[var(--muted)]">
+                        {newsletter.dateRange}
+                      </p>
+                    )}
                   </div>
                   <span className="text-[var(--color-charm)] font-medium shrink-0">
                     Read →

@@ -32,18 +32,6 @@ export async function generateMetadata({
   };
 }
 
-// Format date for display
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
@@ -91,9 +79,6 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
             {newsletter.dateRange}
           </p>
         )}
-        <p className="text-[var(--muted)]">
-          Published {formatDate(newsletter.generated)}
-        </p>
       </header>
 
       {/* Newsletter content */}
