@@ -67,7 +67,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
     // Remove horizontal rules (--- separators) — section headers are enough
     .replace(/^---\s*$/gm, "")
     // Remove trailing sign-off (redundant with CTA section below)
-    .replace(/Got a family event to share\?.*$/s, "")
+    .replace(/Got a family event to share\?[\s\S]*$/, "")
     .trimStart()
     .trimEnd();
 
