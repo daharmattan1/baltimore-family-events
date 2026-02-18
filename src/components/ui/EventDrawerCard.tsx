@@ -4,6 +4,9 @@ import {
   getCostBadgeClass,
   getCategoryBorderColor,
   getAgeLabel,
+  getVenueSourceBadgeLabel,
+  getVenueSourceBadgeColor,
+  getAudienceBadgeLabel,
 } from "@/lib/event-helpers";
 
 interface EventDrawerCardProps {
@@ -53,6 +56,16 @@ export default function EventDrawerCard({ event }: EventDrawerCardProps) {
         {event.age_range_category && (
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-agent-toddler)]/10 text-[var(--color-agent-toddler)] font-medium">
             {getAgeLabel(event.age_range_category)}
+          </span>
+        )}
+        {event.venue_source_category && getVenueSourceBadgeLabel(event.venue_source_category) && (
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${getVenueSourceBadgeColor(event.venue_source_category)}`}>
+            {getVenueSourceBadgeLabel(event.venue_source_category)}
+          </span>
+        )}
+        {event.audience_openness === "open_to_all" && (
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+            {getAudienceBadgeLabel(event.audience_openness)}
           </span>
         )}
       </div>

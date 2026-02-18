@@ -5,6 +5,9 @@ import {
   getCategoryBorderColor,
   getAgeLabel,
   getEventTypeIcon,
+  getVenueSourceBadgeLabel,
+  getVenueSourceBadgeColor,
+  getAudienceBadgeLabel,
 } from "@/lib/event-helpers";
 
 interface EventCardProps {
@@ -86,6 +89,20 @@ export default function EventCard({ event }: EventCardProps) {
               : event.venue_type === "virtual"
               ? "Virtual"
               : "Indoor/Outdoor"}
+          </span>
+        )}
+
+        {/* Venue source badge — Faith & Community in Calvert Gold */}
+        {event.venue_source_category && getVenueSourceBadgeLabel(event.venue_source_category) && (
+          <span className={`badge text-xs px-2 py-1 rounded-full font-medium ${getVenueSourceBadgeColor(event.venue_source_category)}`}>
+            {getVenueSourceBadgeLabel(event.venue_source_category)}
+          </span>
+        )}
+
+        {/* Audience openness badge */}
+        {event.audience_openness === "open_to_all" && (
+          <span className="badge text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 font-medium">
+            {getAudienceBadgeLabel(event.audience_openness)}
           </span>
         )}
       </div>
