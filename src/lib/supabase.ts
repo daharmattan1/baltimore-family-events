@@ -292,6 +292,47 @@ export async function fetchWeekendEvents(filters: EventFilters = {}) {
   return grouped;
 }
 
+// Venue type matching the baltimore.venues table
+export interface BaltimoreVenue {
+  id: number;
+  name: string;
+  google_place_id?: string;
+  generated_id?: string;
+  category: string;
+  subcategory?: string;
+  county?: string;
+  address?: string;
+  lat?: number;
+  lng?: number;
+  rating?: number;
+  user_ratings_total?: number;
+  website?: string;
+  phone?: string;
+  hours?: string[];
+  google_types?: string[];
+  triage_tier?: string;
+  enabled?: boolean;
+}
+
+// Fetch venues grouped by category, P1 first then by rating
+export async function fetchVenues() {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from("baltimore_venues")
+    .select("*")
+    .order("triage_tier", { ascending: true })
+    .order("rating", { ascending: false, nullsFirst: false })
+    .limit(500);
+
+  if (error) {
+    console.error("Error fetching venues:", error);
+    throw error;
+  }
+
+  return data as BaltimoreVenue[];
+}
+
 // Fetch classes and camps (registration-required activities)
 export async function fetchClasses() {
   const supabase = getSupabase();
