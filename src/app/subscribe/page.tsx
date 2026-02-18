@@ -1,18 +1,38 @@
-import Image from "next/image";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Subscribe | Free Weekly Baltimore Family Events",
-  description:
-    "Get the best family-friendly events in Baltimore delivered to your inbox every Thursday at 7am. 112+ sources, 5 parent personas, always free.",
-  openGraph: {
-    title: "Subscribe to Bmore Families",
-    description:
-      "The best 5-7 family events for THIS weekend, delivered Thursday morning. Free forever.",
-  },
-};
+import Image from "next/image";
+import { useState, type FormEvent } from "react";
 
 export default function SubscribePage() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to subscribe");
+      }
+
+      setStatus("success");
+      setEmail("");
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
+    }
+  }
+
   return (
     <div>
       {/* Hero Section with Wave */}
@@ -82,26 +102,41 @@ export default function SubscribePage() {
                 </p>
               </div>
 
-              {/* Form - will be replaced by Beehiiv embed */}
-              <form
-                action="https://baltimorefamilyevents.beehiiv.com/subscribe"
-                method="POST"
-                className="space-y-4"
-              >
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="your@email.com"
-                  required
-                  className="w-full px-4 py-3 border border-[var(--muted)]/30 rounded-lg bg-[var(--color-rowhouse)] focus:outline-none focus:ring-2 focus:ring-[var(--color-charm)] focus:border-transparent text-[var(--color-boh)] placeholder:text-[var(--muted)]"
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary w-full text-lg py-4"
-                >
-                  Subscribe Free →
-                </button>
-              </form>
+              {status === "success" ? (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-3">🎉</div>
+                  <h3 className="font-display text-xl font-semibold text-[var(--color-boh)] mb-2">
+                    You&apos;re in!
+                  </h3>
+                  <p className="text-[var(--color-harbor)]">
+                    Check your inbox for a welcome email. Your first weekend guide drops Thursday at 7am.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    disabled={status === "loading"}
+                    className="w-full px-4 py-3 border border-[var(--muted)]/30 rounded-lg bg-[var(--color-rowhouse)] focus:outline-none focus:ring-2 focus:ring-[var(--color-charm)] focus:border-transparent text-[var(--color-boh)] placeholder:text-[var(--muted)] disabled:opacity-50"
+                  />
+                  <button
+                    type="submit"
+                    disabled={status === "loading"}
+                    className="btn btn-primary w-full text-lg py-4 disabled:opacity-70"
+                  >
+                    {status === "loading" ? "Subscribing..." : "Subscribe Free →"}
+                  </button>
+                  {status === "error" && (
+                    <p className="text-red-600 text-sm text-center">
+                      {errorMessage}
+                    </p>
+                  )}
+                </form>
+              )}
 
               <p className="text-xs text-[var(--muted)] text-center mt-4">
                 No spam. Unsubscribe at any time. Your inbox is sacred.

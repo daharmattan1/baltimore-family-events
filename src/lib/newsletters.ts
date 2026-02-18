@@ -17,6 +17,7 @@ export interface Newsletter {
 function getNewslettersDirectory(): string {
   // Check multiple possible locations
   const possiblePaths = [
+    path.join(process.cwd(), "content", "newsletters"),
     path.join(process.cwd(), "..", "drafts"),
     path.join(process.cwd(), "newsletters"),
     path.join(process.cwd(), "..", "..", "drafts"),
@@ -55,7 +56,7 @@ export function getAllNewsletters(): Newsletter[] {
 
       return {
         slug,
-        title: data.name || "Baltimore Family Newsletter",
+        title: data.title || data.name || "Baltimore Family Newsletter",
         dateRange: data.date_range || "",
         generated: data.generated || "",
         status: data.status || "draft",

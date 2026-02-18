@@ -24,12 +24,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Bmore Families",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Bmore Families - AI-Curated Baltimore Family Events",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bmore Families | Your Weekend, Sorted",
     description:
       "Stop scrolling 20 websites. The best family events in Baltimore, delivered every Thursday.",
+    images: ["/og-image.png"],
   },
   keywords: [
     "Baltimore family events",
