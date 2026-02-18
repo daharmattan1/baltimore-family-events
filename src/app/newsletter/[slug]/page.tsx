@@ -54,11 +54,11 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
     notFound();
   }
 
-  // Strip redundant H1 title + date line from markdown body
+  // Strip redundant H1 title + bold date line from markdown body
   // (these are now shown in the page header from frontmatter)
   const cleanedContent = newsletter.content
-    .replace(/^#\s+.*\n/, "")          // Remove first H1 line
-    .replace(/^\*\*.*?\d{4}\*\*\n?/, "") // Remove bold date line
+    .replace(/^\s*#\s+[^\n]+\n/, "")       // Remove first H1 line
+    .replace(/^\s*\*\*[^\n]*\d{4}\*\*\n?/, "") // Remove bold date line
     .trimStart();
 
   return (
