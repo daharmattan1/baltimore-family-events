@@ -8,15 +8,23 @@ import FilterDrawer from "@/components/ui/FilterDrawer";
 import ViewToggle from "@/components/ui/ViewToggle";
 import CalendarGrid from "@/components/ui/CalendarGrid";
 import EventDrawer from "@/components/ui/EventDrawer";
+import WeekendSection from "@/components/ui/WeekendSection";
 import { useCalendarNavigation } from "@/hooks/useCalendarNavigation";
 import { groupEventsByDate } from "@/lib/event-helpers";
 import { BaltimoreEvent } from "@/lib/supabase";
 
+interface WeekendGroup {
+  start: string;
+  end: string;
+  events: BaltimoreEvent[];
+}
+
 export default function CalendarPage() {
   const [events, setEvents] = useState<BaltimoreEvent[]>([]);
+  const [weekendGroups, setWeekendGroups] = useState<WeekendGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "weekends">("list");
   const [filters, setFilters] = useState({
     eventType: [] as string[],
     ageRange: [] as string[],
@@ -53,29 +61,40 @@ export default function CalendarPage() {
       if (filters.locationArea.length > 0) params.set("locationArea", filters.locationArea.join(","));
       if (filters.includeFaith) params.set("includeFaith", "true");
 
-      if (viewMode === "calendar") {
+      if (viewMode === "weekends") {
+        // Fetch weekend-grouped events
+        params.set("weekends", "true");
+        const response = await fetch(`/api/events?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to fetch events");
+        setWeekendGroups(data.weekends || []);
+        setEvents([]);
+      } else if (viewMode === "calendar") {
         // In calendar view, fetch the entire displayed month
         const range = getMonthDateRange();
         params.set("startDate", range.start);
         params.set("endDate", range.end);
         params.set("limit", "200");
-      } else if (dateFilter) {
-        // In list view, use date filter pills
-        const range = getDateRange(dateFilter);
-        if (range) {
-          params.set("startDate", range.start);
-          params.set("endDate", range.end);
+        const response = await fetch(`/api/events?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to fetch events");
+        setEvents(data.events || []);
+        setWeekendGroups([]);
+      } else {
+        // List view
+        if (dateFilter) {
+          const range = getDateRange(dateFilter);
+          if (range) {
+            params.set("startDate", range.start);
+            params.set("endDate", range.end);
+          }
         }
+        const response = await fetch(`/api/events?${params.toString()}`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Failed to fetch events");
+        setEvents(data.events || []);
+        setWeekendGroups([]);
       }
-
-      const response = await fetch(`/api/events?${params.toString()}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch events");
-      }
-
-      setEvents(data.events || []);
     } catch (err) {
       console.error("Error fetching events:", err);
       setError(err instanceof Error ? err.message : "Failed to load events");
@@ -107,7 +126,7 @@ export default function CalendarPage() {
     setVisibleCount(12);
   };
 
-  const handleViewChange = (mode: "list" | "calendar") => {
+  const handleViewChange = (mode: "list" | "calendar" | "weekends") => {
     setViewMode(mode);
     setSelectedDay(null);
     if (mode === "list") {
@@ -157,6 +176,9 @@ export default function CalendarPage() {
     setDateFilter((prev) => (prev === preset ? "" : preset));
     setVisibleCount(12);
   };
+
+  // Total weekend events count
+  const totalWeekendEvents = weekendGroups.reduce((sum, w) => sum + w.events.length, 0);
 
   return (
     <div>
@@ -244,6 +266,15 @@ export default function CalendarPage() {
                   ))}
                 </div>
               </div>
+            ) : viewMode === "weekends" ? (
+              <div className="col-span-full space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-white border border-[var(--muted)]/20 rounded-xl p-6 animate-pulse">
+                    <div className="h-5 bg-[var(--muted)]/30 rounded w-48 mb-3"></div>
+                    <div className="h-4 bg-[var(--muted)]/20 rounded w-24"></div>
+                  </div>
+                ))}
+              </div>
             ) : (
               [1, 2, 3, 4, 5, 6].map((i) => (
                 <div
@@ -271,6 +302,27 @@ export default function CalendarPage() {
               Try Again
             </button>
           </div>
+        )}
+
+        {/* ===== WEEKENDS VIEW ===== */}
+        {viewMode === "weekends" && !loading && !error && (
+          <>
+            <p className="text-sm text-[var(--muted)] mb-4 flex items-center gap-2">
+              <span className="text-[var(--color-crab)]">🦀</span>
+              {totalWeekendEvents} event{totalWeekendEvents !== 1 ? "s" : ""} across {weekendGroups.length} weekends
+            </p>
+            <div className="space-y-4">
+              {weekendGroups.map((weekend, idx) => (
+                <WeekendSection
+                  key={weekend.start}
+                  start={weekend.start}
+                  end={weekend.end}
+                  events={weekend.events}
+                  defaultOpen={idx === 0}
+                />
+              ))}
+            </div>
+          </>
         )}
 
         {/* ===== CALENDAR VIEW ===== */}

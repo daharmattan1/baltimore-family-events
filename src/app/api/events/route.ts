@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchEvents, fetchFeaturedEvents, EventFilters } from "@/lib/supabase";
+import { fetchEvents, fetchFeaturedEvents, fetchWeekendEvents, fetchClasses, EventFilters } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,6 +11,33 @@ export async function GET(request: NextRequest) {
       const limit = parseInt(searchParams.get("limit") || "4");
       const events = await fetchFeaturedEvents(limit);
       return NextResponse.json({ events, count: events.length });
+    }
+
+    // Check if requesting classes
+    const classes = searchParams.get("classes");
+    if (classes === "true") {
+      const events = await fetchClasses();
+      return NextResponse.json({ events, count: events.length });
+    }
+
+    // Check if requesting weekend events
+    const weekends = searchParams.get("weekends");
+    if (weekends === "true") {
+      const filters: EventFilters = {};
+      const eventType = searchParams.get("eventType");
+      const ageRange = searchParams.get("ageRange");
+      const costType = searchParams.get("costType");
+      const locationArea = searchParams.get("locationArea");
+      const includeFaith = searchParams.get("includeFaith");
+
+      if (eventType) filters.eventType = eventType.split(",");
+      if (ageRange) filters.ageRange = ageRange.split(",");
+      if (costType) filters.costType = costType.split(",");
+      if (locationArea) filters.locationArea = locationArea.split(",");
+      if (includeFaith === "true") filters.includeFaith = true;
+
+      const weekendData = await fetchWeekendEvents(filters);
+      return NextResponse.json({ weekends: weekendData });
     }
 
     // Build filters from query params (supports comma-separated multi-select)

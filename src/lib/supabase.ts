@@ -97,6 +97,7 @@ export async function fetchEvents(filters: EventFilters = {}) {
     .select("*")
     .eq("is_relevant", true)
     .in("moderation_status", ["auto_approved", "approved"])
+    .not("event_type", "in", '("class","camp")')
     .order("event_date_start", { ascending: true });
 
   // Date range filter
@@ -197,4 +198,119 @@ export async function fetchFeaturedEvents(limit = 4) {
   }
 
   return topData as BaltimoreEvent[];
+}
+
+// Fetch events for next 3 weekends (Fri-Sun), excluding classes
+export async function fetchWeekendEvents(filters: EventFilters = {}) {
+  const supabase = getSupabase();
+  const today = new Date();
+
+  // Calculate next 3 Fri-Sun windows
+  const weekends: { start: string; end: string }[] = [];
+  const current = new Date(today);
+
+  // Find next Friday (or today if it's Fri/Sat/Sun)
+  const dayOfWeek = current.getDay();
+  let daysUntilFriday: number;
+  if (dayOfWeek === 5) daysUntilFriday = 0; // Friday
+  else if (dayOfWeek === 6) daysUntilFriday = 6; // Saturday -> next Friday
+  else if (dayOfWeek === 0) daysUntilFriday = 5; // Sunday -> next Friday
+  else daysUntilFriday = 5 - dayOfWeek;
+
+  // But if today is Sat or Sun, include this weekend too
+  let firstFriday: Date;
+  if (dayOfWeek === 6 || dayOfWeek === 0) {
+    // We're in a weekend — find the Friday of THIS weekend
+    const thisFriday = new Date(today);
+    thisFriday.setDate(today.getDate() - (dayOfWeek === 6 ? 1 : 2));
+    firstFriday = thisFriday;
+  } else {
+    firstFriday = new Date(today);
+    firstFriday.setDate(today.getDate() + daysUntilFriday);
+  }
+
+  for (let i = 0; i < 3; i++) {
+    const friday = new Date(firstFriday);
+    friday.setDate(firstFriday.getDate() + i * 7);
+    const sunday = new Date(friday);
+    sunday.setDate(friday.getDate() + 2);
+    weekends.push({
+      start: friday.toISOString().split("T")[0],
+      end: sunday.toISOString().split("T")[0],
+    });
+  }
+
+  // Fetch all events within the 3-weekend window
+  const overallStart = weekends[0].start;
+  const overallEnd = weekends[2].end;
+
+  let query = supabase
+    .from("baltimore_events")
+    .select("*")
+    .eq("is_relevant", true)
+    .in("moderation_status", ["auto_approved", "approved"])
+    .not("event_type", "in", '("class","camp")')
+    .gte("event_date_start", overallStart < today.toISOString().split("T")[0] ? today.toISOString().split("T")[0] : overallStart)
+    .lte("event_date_start", overallEnd)
+    .order("event_date_start", { ascending: true })
+    .limit(200);
+
+  // Apply same filters as main view
+  if (filters.eventType && filters.eventType.length > 0) {
+    query = query.in("event_type", filters.eventType);
+  }
+  if (filters.ageRange && filters.ageRange.length > 0) {
+    query = query.in("age_range_category", filters.ageRange);
+  }
+  if (filters.costType && filters.costType.length > 0) {
+    query = query.in("cost_type", filters.costType);
+  }
+  if (filters.locationArea && filters.locationArea.length > 0) {
+    query = query.in("location_area", filters.locationArea);
+  }
+  if (!filters.includeFaith) {
+    query = query.or("audience_openness.is.null,audience_openness.eq.open_to_all");
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Error fetching weekend events:", error);
+    throw error;
+  }
+
+  // Group events by weekend window
+  const allEvents = data as BaltimoreEvent[];
+  const grouped = weekends.map((weekend) => ({
+    ...weekend,
+    events: allEvents.filter((e) => {
+      const d = e.event_date_start?.split("T")[0] || "";
+      return d >= weekend.start && d <= weekend.end;
+    }),
+  }));
+
+  return grouped;
+}
+
+// Fetch classes and camps (registration-required activities)
+export async function fetchClasses() {
+  const supabase = getSupabase();
+  const today = new Date().toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("baltimore_events")
+    .select("*")
+    .eq("is_relevant", true)
+    .in("moderation_status", ["auto_approved", "approved"])
+    .in("event_type", ["class", "camp"])
+    .gte("event_date_start", today)
+    .order("event_date_start", { ascending: true })
+    .limit(100);
+
+  if (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+
+  return data as BaltimoreEvent[];
 }
