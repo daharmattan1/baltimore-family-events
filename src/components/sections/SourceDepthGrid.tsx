@@ -94,8 +94,6 @@ const COUNTIES = [
 ];
 
 export default function SourceDepthGrid() {
-  const totalSources = SOURCE_CATEGORIES.reduce((sum, cat) => sum + cat.count, 0);
-
   return (
     <section className="py-20 bg-[var(--color-formstone)]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,7 +101,7 @@ export default function SourceDepthGrid() {
           What We Cover
         </h2>
         <p className="text-center text-[var(--color-harbor)] mb-12 max-w-2xl mx-auto">
-          <span className="font-semibold text-[var(--color-crab)]">{totalSources} sources</span>{" "}
+          <span className="font-semibold text-[var(--color-crab)]">193 sources</span>{" "}
           and growing across 12 categories. You&apos;re not going to check them all — we already did.
         </p>
 
