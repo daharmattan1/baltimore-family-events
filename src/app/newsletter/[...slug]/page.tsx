@@ -81,6 +81,20 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
         )}
       </header>
 
+      {/* Calendar link */}
+      <div className="mb-8 flex items-center gap-3 px-4 py-3 bg-[var(--color-charm)]/5 rounded-lg border border-[var(--color-charm)]/10">
+        <span className="text-lg" aria-hidden="true">📅</span>
+        <p className="text-sm text-[var(--color-harbor)]">
+          Want the full list?{" "}
+          <Link
+            href="/calendar"
+            className="text-[var(--color-charm)] font-medium hover:underline no-underline"
+          >
+            Browse all events on the calendar →
+          </Link>
+        </p>
+      </div>
+
       {/* Newsletter content */}
       <article className="prose prose-lg max-w-none prose-headings:text-[var(--color-boh)] prose-p:text-[var(--color-harbor)] prose-a:text-[var(--color-charm)] prose-strong:text-[var(--color-boh)] prose-li:text-[var(--color-harbor)]">
         <ReactMarkdown
