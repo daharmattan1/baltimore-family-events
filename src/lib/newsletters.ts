@@ -51,12 +51,32 @@ export function getAllNewsletters(): Newsletter[] {
       const fileContent = fs.readFileSync(filePath, "utf-8");
       const { data, content } = matter(fileContent);
 
-      // Extract slug from filename (remove .md and date prefix if present)
-      const slug = filename.replace(".md", "");
+      const title = data.title || data.name || "Baltimore Family Newsletter";
+
+      // Build clean URL slug: M-DD-YYYY/topic-slug
+      // e.g. "2-11-2026/valentines-weekend-activities"
+      const genDate = data.generated ? new Date(data.generated) : null;
+      let slug: string;
+      if (genDate && title) {
+        const month = genDate.getUTCMonth() + 1;
+        const day = genDate.getUTCDate();
+        const year = genDate.getUTCFullYear();
+        const topicSlug = title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "")
+          .slice(0, 60)
+          .replace(/-$/, "");
+        slug = `${month}-${day}-${year}/${topicSlug}`;
+      } else {
+        slug = filename.replace(".md", "");
+      }
 
       return {
         slug,
-        title: data.title || data.name || "Baltimore Family Newsletter",
+        title,
         dateRange: data.date_range || "",
         generated: data.generated || "",
         status: data.status || "draft",

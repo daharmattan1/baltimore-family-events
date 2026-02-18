@@ -5,19 +5,21 @@ import { getNewsletterBySlug, getAllNewsletterSlugs } from "@/lib/newsletters";
 import type { Metadata } from "next";
 
 // Generate static params for all newsletters
+// Catch-all routes need slug as string[]
 export function generateStaticParams() {
   const slugs = getAllNewsletterSlugs();
-  return slugs.map((slug) => ({ slug }));
+  return slugs.map((slug) => ({ slug: slug.split("/") }));
 }
 
 // Dynamic metadata for each newsletter issue
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const newsletter = getNewsletterBySlug(slug);
+  const fullSlug = slug.join("/");
+  const newsletter = getNewsletterBySlug(fullSlug);
   if (!newsletter) return { title: "Newsletter" };
 
   return {
@@ -43,12 +45,13 @@ function formatDate(dateStr?: string): string {
 }
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }
 
 export default async function NewsletterIssuePage({ params }: PageProps) {
   const { slug } = await params;
-  const newsletter = getNewsletterBySlug(slug);
+  const fullSlug = slug.join("/");
+  const newsletter = getNewsletterBySlug(fullSlug);
 
   if (!newsletter) {
     notFound();
@@ -203,7 +206,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
       <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center py-6 border-t border-[var(--muted)]/20">
         <p className="text-sm text-[var(--color-harbor)]">Know a Baltimore parent who&apos;d love this?</p>
         <a
-          href={`mailto:?subject=${encodeURIComponent(`Check out BmoreFamilies: ${newsletter.title}`)}&body=${encodeURIComponent(`I thought you'd like this weekly Baltimore family events newsletter:\n\nhttps://bmorefamilies.com/newsletter/${slug}`)}`}
+          href={`mailto:?subject=${encodeURIComponent(`Check out BmoreFamilies: ${newsletter.title}`)}&body=${encodeURIComponent(`I thought you'd like this weekly Baltimore family events newsletter:\n\nhttps://bmorefamilies.com/newsletter/${fullSlug}`)}`}
           className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-formstone)] text-[var(--color-boh)] rounded-lg hover:bg-[var(--color-charm)]/10 transition-colors text-sm font-medium no-underline"
         >
           Forward to a Friend →
