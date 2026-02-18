@@ -20,13 +20,12 @@ export async function generateMetadata({
   const newsletter = getNewsletterBySlug(slug);
   if (!newsletter) return { title: "Newsletter" };
 
-  const title = newsletter.dateRange || newsletter.title;
   return {
-    title: `${title} | Newsletter`,
-    description: `Baltimore family events for ${title}. AI-curated picks from 112+ sources across 5 counties.`,
+    title: `${newsletter.title} | BmoreFamilies`,
+    description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. AI-curated picks from 112+ sources across 5 counties.`,
     openGraph: {
-      title: `${title} | Newsletter`,
-      description: `This week's best family events in Baltimore.`,
+      title: newsletter.title,
+      description: `Baltimore family events for ${newsletter.dateRange || "this weekend"}. Curated from 112+ sources.`,
     },
   };
 }
@@ -55,7 +54,12 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
     notFound();
   }
 
-  const issueTitle = newsletter.dateRange || newsletter.title;
+  // Strip redundant H1 title + date line from markdown body
+  // (these are now shown in the page header from frontmatter)
+  const cleanedContent = newsletter.content
+    .replace(/^#\s+.*\n/, "")          // Remove first H1 line
+    .replace(/^\*\*.*?\d{4}\*\*\n?/, "") // Remove bold date line
+    .trimStart();
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -70,8 +74,13 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
       {/* Header */}
       <header className="mb-8">
         <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-2">
-          {issueTitle}
+          {newsletter.title}
         </h1>
+        {newsletter.dateRange && (
+          <p className="text-lg text-[var(--color-harbor)] mb-1">
+            {newsletter.dateRange}
+          </p>
+        )}
         <p className="text-[var(--muted)]">
           Published {formatDate(newsletter.generated)}
         </p>
@@ -186,7 +195,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
             ),
           }}
         >
-          {newsletter.content}
+          {cleanedContent}
         </ReactMarkdown>
       </article>
 
@@ -194,7 +203,7 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
       <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center py-6 border-t border-[var(--muted)]/20">
         <p className="text-sm text-[var(--color-harbor)]">Know a Baltimore parent who&apos;d love this?</p>
         <a
-          href={`mailto:?subject=${encodeURIComponent(`Check out Bmore Families: ${issueTitle}`)}&body=${encodeURIComponent(`I thought you'd like this weekly Baltimore family events newsletter:\n\nhttps://bmorefamilies.com/newsletter/${slug}`)}`}
+          href={`mailto:?subject=${encodeURIComponent(`Check out BmoreFamilies: ${newsletter.title}`)}&body=${encodeURIComponent(`I thought you'd like this weekly Baltimore family events newsletter:\n\nhttps://bmorefamilies.com/newsletter/${slug}`)}`}
           className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-formstone)] text-[var(--color-boh)] rounded-lg hover:bg-[var(--color-charm)]/10 transition-colors text-sm font-medium no-underline"
         >
           Forward to a Friend →

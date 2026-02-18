@@ -108,9 +108,10 @@ export default function NewsletterPage() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h2 className="text-lg font-display font-semibold text-[var(--color-boh)] mb-1">
-                      {newsletter.dateRange || newsletter.title}
+                      {newsletter.title}
                     </h2>
                     <p className="text-sm text-[var(--muted)]">
+                      {newsletter.dateRange && <span>{newsletter.dateRange} · </span>}
                       Published {formatDate(newsletter.generated)}
                     </p>
                   </div>
