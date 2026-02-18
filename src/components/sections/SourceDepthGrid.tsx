@@ -101,8 +101,8 @@ export default function SourceDepthGrid() {
           What We Cover
         </h2>
         <p className="text-center text-[var(--color-harbor)] mb-12 max-w-2xl mx-auto">
-          <span className="font-semibold text-[var(--color-crab)]">193 sources</span>{" "}
-          and growing across 12 categories. You&apos;re not going to check them all — we already did.
+          <span className="font-semibold text-[var(--color-crab)]">310+ sources</span>{" "}
+          and growing across 12 categories and 5 counties.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

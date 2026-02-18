@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Bmore Families | AI-Curated Baltimore Family Events Every Week",
   description:
-    "Stop scrolling 193 websites. Get the best family events in Baltimore delivered Thursday. 193 sources, 5 counties, 5 parent personas + 1 real dad. Free forever.",
+    "Stop scrolling 310+ sources. Get the best family events in Baltimore delivered Thursday. 310+ sources, 5 counties, 5 parent personas + 1 real dad. Free forever.",
   keywords: [
     "Baltimore family events",
     "things to do with kids Baltimore",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Bmore Families | Your Weekend, Sorted",
     description:
-      "AI-curated family events from 193 sources across 5 Baltimore counties. Free weekly newsletter.",
+      "AI-curated family events from 310+ sources across 5 Baltimore counties. Free weekly newsletter.",
     type: "website",
     locale: "en_US",
     siteName: "Bmore Families",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Bmore Families | Your Weekend, Sorted",
     description:
-      "Stop scrolling 193 websites. Get the best family events in Baltimore delivered every Thursday.",
+      "Stop scrolling 310+ sources. Get the best family events in Baltimore delivered every Thursday.",
   },
 };
 
@@ -70,7 +70,7 @@ export default function Home() {
           </h1>
 
           <p className="font-body text-lg sm:text-xl text-[var(--color-harbor)] max-w-2xl mx-auto mb-10 leading-relaxed">
-            We source the best family activities from 193 sources and growing. Browse the calendar or get the best picks delivered every Thursday morning.
+            We source the best family activities from 310+ sources and growing. Browse the calendar or get the best picks delivered every Thursday morning.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -128,7 +128,7 @@ export default function Home() {
             How It Works
           </h2>
           <p className="text-center text-[var(--color-harbor)] mb-12 max-w-2xl mx-auto">
-            You could check 193 websites yourself. Or you could let five AI parents and one real dad do it for you.
+            You could check 310+ sources yourself. Or you could let five AI parents and one real dad do it for you.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -141,7 +141,7 @@ export default function Home() {
                 We Scan Everything
               </h3>
               <p className="text-[var(--color-harbor)] leading-relaxed">
-                Every week, we pull from 193 sources across 5 counties — museums, swim schools, libraries, parks, synagogues, churches, farms, and 21 Facebook and Reddit groups where local parents share what they&apos;ve actually tried.
+                Every week, we pull from 310+ sources across 5 counties — museum calendars, library event pages, park programming, performing arts theaters, swim schools, sports leagues, farms, nature centers, seasonal attractions, community centers, and the Facebook groups and Reddit threads where local parents share what actually worked.
               </p>
             </div>
 
@@ -190,11 +190,9 @@ export default function Home() {
 
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-3xl sm:text-4xl font-bold mb-4">
-            193 Sources. One Thursday Email.
+            310+ Sources. One Thursday Email.
           </h2>
           <p className="text-gray-300 mb-8 text-lg">
-            You&apos;re not going to check 193 websites every week. We already did.
-            <br />
             Free forever. Unsubscribe anytime. Built by a Baltimore dad who got tired of Googling.
           </p>
           <Link

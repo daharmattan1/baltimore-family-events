@@ -67,7 +67,7 @@ export default function SubscribePage() {
           </h1>
           <p className="text-lg text-[var(--color-harbor)] max-w-xl mx-auto">
             The best 5-7 family events for THIS weekend, delivered Thursday at 7am.
-            193 sources. Zero scrolling. Always free.
+            310+ sources. Zero scrolling. Always free.
           </p>
         </div>
 
@@ -86,6 +86,16 @@ export default function SubscribePage() {
       {/* Subscribe Form Section */}
       <section className="py-12 sm:py-16">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Trust Statement */}
+          <div className="bg-[var(--color-formstone)] rounded-xl p-6 mb-8 border border-[var(--muted)]/10">
+            <p className="text-sm text-[var(--color-harbor)] leading-relaxed">
+              Baltimore Family Events is a personal project built by Victor Sowers, a Baltimore dad
+              who wanted a better way to find family activities. This is not a company. There are no
+              investors. There is no business model that relies on your data. I built this for my
+              family and decided to share it with others.
+            </p>
+          </div>
+
           {/* Beehiiv Form Card */}
           <div className="relative mb-12">
             {/* Crab Orange accent bar at top */}

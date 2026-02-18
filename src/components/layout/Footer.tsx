@@ -26,7 +26,7 @@ export default function Footer() {
               <span className="text-[var(--color-crab)]">Families</span>
             </h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              AI-curated family events from 193 sources across 5 counties.
+              AI-curated family events from 310+ sources across 5 counties.
               Never miss the best activities for your family.
             </p>
           </div>
