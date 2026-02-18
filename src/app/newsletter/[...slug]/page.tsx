@@ -57,12 +57,19 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
     notFound();
   }
 
-  // Strip redundant H1 title + bold date line from markdown body
-  // (these are now shown in the page header from frontmatter)
+  // Clean up the markdown content for web display
   const cleanedContent = newsletter.content
-    .replace(/^\s*#\s+[^\n]+\n/, "")       // Remove first H1 line
-    .replace(/^\s*\*\*[^\n]*\d{4}\*\*\n?/, "") // Remove bold date line
-    .trimStart();
+    // Remove redundant H1 title + bold date line (shown in page header)
+    .replace(/^\s*#\s+[^\n]+\n/, "")
+    .replace(/^\s*\*\*[^\n]*\d{4}\*\*\n?/, "")
+    // Remove <details> agent reasoning section (internal, not for readers)
+    .replace(/<details>[\s\S]*?<\/details>/g, "")
+    // Remove horizontal rules (--- separators) — section headers are enough
+    .replace(/^---\s*$/gm, "")
+    // Remove trailing sign-off (redundant with CTA section below)
+    .replace(/Got a family event to share\?.*$/s, "")
+    .trimStart()
+    .trimEnd();
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -106,17 +113,17 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
             ),
             // Style headings
             h1: ({ children }) => (
-              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mt-8 mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mt-10 mb-4">
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-boh)] mt-8 mb-4 border-b border-[var(--muted)]/20 pb-2">
+              <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-boh)] mt-10 mb-4">
                 {children}
               </h2>
             ),
             h3: ({ children }) => (
-              <h3 className="text-lg font-semibold text-[var(--color-boh)] mt-6 mb-2">
+              <h3 className="text-lg font-semibold text-[var(--color-boh)] mt-8 mb-3">
                 {children}
               </h3>
             ),
@@ -126,16 +133,22 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
                 {children}
               </p>
             ),
-            // Style lists
+            // Style lists — generous spacing for multi-line event items
             ul: ({ children }) => (
-              <ul className="list-disc list-inside mb-4 space-y-2 text-[var(--color-harbor)]">
+              <ul className="list-disc pl-5 mb-6 space-y-4 text-[var(--color-harbor)]">
                 {children}
               </ul>
             ),
             ol: ({ children }) => (
-              <ol className="list-decimal list-inside mb-4 space-y-2 text-[var(--color-harbor)]">
+              <ol className="list-decimal pl-5 mb-6 space-y-4 text-[var(--color-harbor)]">
                 {children}
               </ol>
+            ),
+            // List items need breathing room for event descriptions
+            li: ({ children }) => (
+              <li className="text-[var(--color-harbor)] leading-relaxed pl-1">
+                {children}
+              </li>
             ),
             // Style blockquotes
             blockquote: ({ children }) => (
@@ -143,8 +156,8 @@ export default async function NewsletterIssuePage({ params }: PageProps) {
                 {children}
               </blockquote>
             ),
-            // Style horizontal rules
-            hr: () => <hr className="my-8 border-[var(--muted)]/30" />,
+            // Hide horizontal rules — section headers provide enough separation
+            hr: () => <></>,
             // Style strong text
             strong: ({ children }) => (
               <strong className="font-semibold text-[var(--color-boh)]">
