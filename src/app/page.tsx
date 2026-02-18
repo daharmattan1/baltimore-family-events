@@ -70,9 +70,7 @@ export default function Home() {
           </h1>
 
           <p className="font-body text-lg sm:text-xl text-[var(--color-harbor)] max-w-2xl mx-auto mb-10 leading-relaxed">
-            193 sources and growing. 5 counties. 5 AI parent personas and one real dad picking the gems.
-            <br className="hidden sm:block" />
-            Browse the calendar anytime, or get the best picks delivered every Thursday.
+            We source the best family activities from 193 sources and growing. Browse the calendar or get the best picks delivered every Thursday morning.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
