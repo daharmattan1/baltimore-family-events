@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
     const ageRange = searchParams.get("ageRange");
     const costType = searchParams.get("costType");
     const locationArea = searchParams.get("locationArea");
+    const venueSourceCategory = searchParams.get("venueSourceCategory");
+    const audienceOpenness = searchParams.get("audienceOpenness");
     const limit = searchParams.get("limit");
 
     if (startDate) filters.startDate = startDate;
@@ -30,6 +32,8 @@ export async function GET(request: NextRequest) {
     if (ageRange) filters.ageRange = ageRange;
     if (costType) filters.costType = costType;
     if (locationArea) filters.locationArea = locationArea;
+    if (venueSourceCategory) filters.venueSourceCategory = venueSourceCategory;
+    if (audienceOpenness) filters.audienceOpenness = audienceOpenness;
     if (limit) filters.limit = parseInt(limit);
 
     const events = await fetchEvents(filters);

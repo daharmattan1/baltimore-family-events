@@ -66,6 +66,8 @@ export interface BaltimoreEvent {
   cost_type?: string;
   cost_amount?: string;
   venue_type?: string;
+  venue_source_category?: string;
+  audience_openness?: string;
   is_relevant?: boolean;
   family_friendly_score?: number;
   featured_worthy?: boolean;
@@ -80,6 +82,8 @@ export interface EventFilters {
   ageRange?: string;
   costType?: string;
   locationArea?: string;
+  venueSourceCategory?: string;
+  audienceOpenness?: string;
   limit?: number;
 }
 
@@ -121,6 +125,18 @@ export async function fetchEvents(filters: EventFilters = {}) {
 
   if (filters.locationArea) {
     query = query.eq("location_area", filters.locationArea);
+  }
+
+  if (filters.venueSourceCategory) {
+    query = query.eq("venue_source_category", filters.venueSourceCategory);
+  }
+
+  // Default: exclude faith_community events unless explicitly requested
+  if (filters.audienceOpenness) {
+    query = query.eq("audience_openness", filters.audienceOpenness);
+  } else if (!filters.venueSourceCategory) {
+    // When not filtering by venue source, hide faith_community events
+    query = query.or("audience_openness.is.null,audience_openness.eq.open_to_all");
   }
 
   // Limit

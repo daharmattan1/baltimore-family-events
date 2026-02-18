@@ -99,6 +99,58 @@ export function getEventTypeIcon(eventType?: string): string {
   }
 }
 
+// Get venue source badge label
+export function getVenueSourceBadgeLabel(category?: string): string {
+  switch (category) {
+    case "religious_institution":
+      return "Faith & Community";
+    case "library":
+      return "Library";
+    case "museum":
+      return "Museum";
+    case "park_recreation":
+      return "Parks & Rec";
+    case "theater_venue":
+      return "Theater";
+    case "school":
+      return "School";
+    case "community_center":
+      return "Community Center";
+    case "commercial":
+      return "Commercial";
+    default:
+      return "";
+  }
+}
+
+// Get audience badge label
+export function getAudienceBadgeLabel(openness?: string): string {
+  switch (openness) {
+    case "open_to_all":
+      return "Open to All";
+    case "faith_community":
+      return "Faith Community";
+    default:
+      return "";
+  }
+}
+
+// Get venue source badge Tailwind classes
+export function getVenueSourceBadgeColor(category?: string): string {
+  switch (category) {
+    case "religious_institution":
+      return "bg-[var(--color-calvert)]/10 text-[var(--color-calvert)]";
+    case "library":
+      return "bg-[var(--color-charm)]/10 text-[var(--color-charm)]";
+    case "park_recreation":
+      return "bg-[var(--color-seafoam)]/20 text-emerald-700";
+    case "theater_venue":
+      return "bg-[var(--color-agent-planner)]/10 text-[var(--color-agent-planner)]";
+    default:
+      return "bg-gray-100 text-gray-600";
+  }
+}
+
 // Group events by date (YYYY-MM-DD key)
 export function groupEventsByDate(
   events: BaltimoreEvent[]
