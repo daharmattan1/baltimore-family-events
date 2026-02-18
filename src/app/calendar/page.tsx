@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import EventCard from "@/components/ui/EventCard";
-import FilterBar from "@/components/ui/FilterBar";
+import FilterChipBar from "@/components/ui/FilterChipBar";
+import FilterDrawer from "@/components/ui/FilterDrawer";
 import ViewToggle from "@/components/ui/ViewToggle";
 import CalendarGrid from "@/components/ui/CalendarGrid";
 import EventDrawer from "@/components/ui/EventDrawer";
@@ -20,8 +21,12 @@ export default function CalendarPage() {
     eventType: "",
     ageRange: "",
     costType: "",
+    venueSourceCategory: "",
+    audienceOpenness: "",
+    locationArea: "",
   });
   const [dateFilter, setDateFilter] = useState("");
+  const [showDrawer, setShowDrawer] = useState(false);
 
   const {
     selectedDay,
@@ -45,6 +50,9 @@ export default function CalendarPage() {
       if (filters.eventType) params.set("eventType", filters.eventType);
       if (filters.ageRange) params.set("ageRange", filters.ageRange);
       if (filters.costType) params.set("costType", filters.costType);
+      if (filters.venueSourceCategory) params.set("venueSourceCategory", filters.venueSourceCategory);
+      if (filters.audienceOpenness) params.set("audienceOpenness", filters.audienceOpenness);
+      if (filters.locationArea) params.set("locationArea", filters.locationArea);
 
       if (viewMode === "calendar") {
         // In calendar view, fetch the entire displayed month
@@ -94,7 +102,7 @@ export default function CalendarPage() {
   };
 
   const handleClearFilters = () => {
-    setFilters({ eventType: "", ageRange: "", costType: "" });
+    setFilters({ eventType: "", ageRange: "", costType: "", venueSourceCategory: "", audienceOpenness: "", locationArea: "" });
     setDateFilter("");
   };
 
@@ -148,30 +156,10 @@ export default function CalendarPage() {
     setDateFilter((prev) => (prev === preset ? "" : preset));
   };
 
-  // Quick filter handlers
-  const handleQuickFilter = (filterType: string) => {
-    if (filterType === "free") {
-      setFilters((prev) => ({
-        ...prev,
-        costType: prev.costType === "free" ? "" : "free",
-      }));
-    } else if (filterType === "toddler") {
-      setFilters((prev) => ({
-        ...prev,
-        ageRange: prev.ageRange === "toddler" ? "" : "toddler",
-      }));
-    } else if (filterType === "outdoor") {
-      setFilters((prev) => ({
-        ...prev,
-        eventType: prev.eventType === "outdoor" ? "" : "outdoor",
-      }));
-    }
-  };
-
   return (
     <div>
       {/* Hero Header */}
-      <section className="relative py-12 sm:py-16 overflow-hidden">
+      <section className="relative py-8 sm:py-10 overflow-hidden">
         {/* Background */}
         <div
           className="absolute inset-0"
@@ -187,7 +175,7 @@ export default function CalendarPage() {
           <p className="text-[var(--color-charm)] font-medium mb-2 tracking-wide uppercase text-sm">
             Explore Events
           </p>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-3">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--color-boh)] mb-3">
             Find Your Weekend
           </h1>
           <p className="text-[var(--color-harbor)] max-w-2xl">
@@ -219,83 +207,26 @@ export default function CalendarPage() {
           )}
         </div>
 
-        {/* Date Filter Pills — only in list view */}
-        {viewMode === "list" && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="text-xs text-[var(--muted)] self-center mr-1 font-medium uppercase tracking-wide">When:</span>
-            <button
-              onClick={() => handleDateFilter("weekend")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-                dateFilter === "weekend"
-                  ? "bg-[var(--color-charm)] text-white shadow-sm"
-                  : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
-              }`}
-            >
-              This Weekend
-            </button>
-            <button
-              onClick={() => handleDateFilter("this-week")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-                dateFilter === "this-week"
-                  ? "bg-[var(--color-charm)] text-white shadow-sm"
-                  : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
-              }`}
-            >
-              This Week
-            </button>
-            <button
-              onClick={() => handleDateFilter("this-month")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-                dateFilter === "this-month"
-                  ? "bg-[var(--color-charm)] text-white shadow-sm"
-                  : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-charm)]/10"
-              }`}
-            >
-              This Month
-            </button>
-          </div>
-        )}
-
-        {/* Quick Filter Pills — both views */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <span className="text-xs text-[var(--muted)] self-center mr-1 font-medium uppercase tracking-wide">Filter:</span>
-          <button
-            onClick={() => handleQuickFilter("free")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-              filters.costType === "free"
-                ? "bg-[var(--color-seafoam)] text-[var(--color-boh)] shadow-sm"
-                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-seafoam)]/20"
-            }`}
-          >
-            💰 Free Only
-          </button>
-          <button
-            onClick={() => handleQuickFilter("toddler")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-              filters.ageRange === "toddler"
-                ? "bg-[var(--color-agent-toddler)] text-white shadow-sm"
-                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-agent-toddler)]/10"
-            }`}
-          >
-            👶 Ages 0-4
-          </button>
-          <button
-            onClick={() => handleQuickFilter("outdoor")}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-drift ${
-              filters.eventType === "outdoor"
-                ? "bg-[var(--color-seafoam)] text-[var(--color-boh)] shadow-sm"
-                : "bg-[var(--color-formstone)] text-[var(--color-harbor)] hover:bg-[var(--color-seafoam)]/20"
-            }`}
-          >
-            🌳 Outdoor
-          </button>
+        {/* Unified Filter Chip Bar */}
+        <div className="mb-4">
+          <FilterChipBar
+            filters={filters}
+            dateFilter={dateFilter}
+            viewMode={viewMode}
+            onFilterChange={handleFilterChange}
+            onDateFilterChange={handleDateFilter}
+            onToggleDrawer={() => setShowDrawer((prev) => !prev)}
+            isDrawerOpen={showDrawer}
+          />
         </div>
 
-        {/* Filters (dropdown selects) */}
-        <FilterBar
+        {/* Collapsible Filter Drawer */}
+        <FilterDrawer
+          isOpen={showDrawer}
           filters={filters}
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
+          onClose={() => setShowDrawer(false)}
         />
 
         {/* Loading State */}
