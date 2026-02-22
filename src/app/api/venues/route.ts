@@ -6,12 +6,9 @@ export async function GET() {
     const venues = await fetchVenues();
     return NextResponse.json({ venues, count: venues.length });
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage = error instanceof Error
-      ? error.message
-      : JSON.stringify(error);
+    console.error("API Error (/api/venues):", error);
     return NextResponse.json(
-      { error: "Failed to fetch venues", details: errorMessage },
+      { error: "Failed to fetch venues" },
       { status: 500 }
     );
   }

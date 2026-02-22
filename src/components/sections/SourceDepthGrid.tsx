@@ -101,8 +101,8 @@ export default function SourceDepthGrid() {
           What We Cover
         </h2>
         <p className="text-center text-[var(--color-harbor)] mb-12 max-w-2xl mx-auto">
-          <span className="font-semibold text-[var(--color-crab)]">310+ sources</span>{" "}
-          and growing across 12 categories and 5 counties.
+          <span className="font-semibold text-[var(--color-crab)]">313 sources cataloged</span>{" "}
+          across 12 categories and 5 counties.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -131,6 +131,10 @@ export default function SourceDepthGrid() {
             </div>
           ))}
         </div>
+
+        <p className="mt-4 text-center text-xs text-[var(--color-muted)]">
+          Counts above reflect cataloged sources (active, pending, and retired). Live coverage status is tracked in the source registry.
+        </p>
 
         {/* County Coverage Bar */}
         <div className="mt-10 bg-white rounded-xl p-6 shadow-sm">

@@ -30,6 +30,21 @@ This project follows the STEEPWORKS workflow - NO local dev server. Instead:
 3. Vercel auto-deploys in ~30-60 seconds
 4. Verify at production URL
 
+### Security Smoke Test
+
+Run the security smoke checks against local or deployed API routes:
+
+```powershell
+./scripts/security_smoke.ps1 -BaseUrl "https://your-site-url"
+```
+
+What it validates:
+- `/api/debug` is not publicly accessible.
+- `/api/events` rejects malformed/unsafe query inputs.
+- `/api/subscribe` enforces JSON content type.
+- `/api/subscribe` rejects honeypot submissions.
+- `/api/subscribe` rate-limits repeated abuse patterns.
+
 ### Pages
 
 | Page | Path | Description |

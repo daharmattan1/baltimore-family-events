@@ -2,8 +2,32 @@ import { createClient } from "@supabase/supabase-js";
 
 // Lazy-initialize Supabase client to avoid build-time errors
 // Supports both NEXT_PUBLIC_ prefixed vars and Vercel Supabase integration vars
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
+
+function parseJwtPayload(token: string): Record<string, unknown> | null {
+  const segments = token.split(".");
+  if (segments.length !== 3) {
+    return null;
+  }
+
+  try {
+    const normalized = segments[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const decoded = atob(padded);
+    return JSON.parse(decoded) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function isServiceRoleKey(key: string): boolean {
+  if (key.toLowerCase().includes("service_role")) {
+    return true;
+  }
+
+  const payload = parseJwtPayload(key);
+  return payload?.role === "service_role";
+}
 
 function getSupabaseClient() {
   if (supabaseInstance) {
@@ -17,20 +41,17 @@ function getSupabaseClient() {
 
   const supabaseAnonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_KEY;
-
-  // Log which env vars are available (without exposing values)
-  console.log("Supabase config:", {
-    hasUrl: !!supabaseUrl,
-    hasKey: !!supabaseAnonKey,
-    urlSource: process.env.NEXT_PUBLIC_SUPABASE_URL ? "NEXT_PUBLIC_SUPABASE_URL" :
-               process.env.SUPABASE_URL ? "SUPABASE_URL" : "none",
-  });
+    process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      `Missing Supabase environment variables. hasUrl=${!!supabaseUrl}, hasKey=${!!supabaseAnonKey}`
+      "Missing Supabase anon credentials. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+    );
+  }
+
+  if (isServiceRoleKey(supabaseAnonKey)) {
+    throw new Error(
+      "Refusing to initialize website Supabase client with a service-role key."
     );
   }
 
@@ -68,6 +89,8 @@ export interface BaltimoreEvent {
   venue_type?: string;
   venue_source_category?: string;
   audience_openness?: string;
+  is_recurring?: boolean;
+  recurrence_pattern?: string;
   is_relevant?: boolean;
   family_friendly_score?: number;
   featured_worthy?: boolean;
@@ -91,6 +114,7 @@ export interface EventFilters {
 // Note: baltimore schema is set at client initialization
 export async function fetchEvents(filters: EventFilters = {}) {
   const supabase = getSupabase();
+  const today = new Date().toISOString().split("T")[0];
 
   let query = supabase
     .from("baltimore_events")
@@ -104,8 +128,8 @@ export async function fetchEvents(filters: EventFilters = {}) {
   if (filters.startDate) {
     query = query.gte("event_date_start", filters.startDate);
   } else {
-    // Default to today onward
-    query = query.gte("event_date_start", new Date().toISOString().split("T")[0]);
+    // Keep recurring entries visible even when their original start date is in the past.
+    query = query.or(`event_date_start.gte.${today},is_recurring.eq.true`);
   }
 
   if (filters.endDate) {
@@ -344,7 +368,7 @@ export async function fetchClasses() {
     .eq("is_relevant", true)
     .in("moderation_status", ["auto_approved", "approved"])
     .in("event_type", ["class", "camp"])
-    .gte("event_date_start", today)
+    .or(`event_date_start.gte.${today},is_recurring.eq.true`)
     .order("event_date_start", { ascending: true })
     .limit(100);
 
