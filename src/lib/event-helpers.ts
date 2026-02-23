@@ -217,6 +217,67 @@ export function groupEventsByType(
   return grouped;
 }
 
+// Generate JSON-LD Event schema for Google rich results
+// Only call with server-rendered events (Google ignores client-injected JSON-LD)
+export function generateEventJsonLd(events: BaltimoreEvent[]) {
+  return events
+    .filter((e) => e.title && e.event_date_start)
+    .slice(0, 20)
+    .map((event) => {
+      const jsonLd: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        name: event.title,
+        startDate: event.event_date_start,
+        eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+        eventStatus: "https://schema.org/EventScheduled",
+      };
+
+      if (event.event_date_end) {
+        jsonLd.endDate = event.event_date_end;
+      }
+
+      if (event.summary || event.content) {
+        const desc = event.summary || event.content || "";
+        jsonLd.description = desc.length > 300 ? desc.slice(0, 297) + "..." : desc;
+      }
+
+      if (event.venue || event.address) {
+        jsonLd.location = {
+          "@type": "Place",
+          ...(event.venue && { name: event.venue }),
+          ...(event.address && {
+            address: {
+              "@type": "PostalAddress",
+              streetAddress: event.address,
+            },
+          }),
+        };
+      }
+
+      if (event.cost_type) {
+        jsonLd.offers = {
+          "@type": "Offer",
+          price: event.cost_type === "free" ? "0" : event.cost_amount || "0",
+          priceCurrency: "USD",
+          availability: event.is_sold_out
+            ? "https://schema.org/SoldOut"
+            : "https://schema.org/InStock",
+        };
+      }
+
+      if (event.image_url) {
+        jsonLd.image = event.image_url;
+      }
+
+      if (event.source_url || event.original_event_url) {
+        jsonLd.url = event.original_event_url || event.source_url;
+      }
+
+      return jsonLd;
+    });
+}
+
 // Get human-readable label for event_type
 export function getEventTypeLabel(eventType: string): string {
   switch (eventType) {
