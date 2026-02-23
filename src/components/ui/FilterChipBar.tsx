@@ -1,5 +1,7 @@
 "use client";
 
+import { pushEvent } from "@/lib/analytics";
+
 interface FilterChipBarProps {
   filters: {
     eventType: string[];
@@ -38,10 +40,16 @@ export default function FilterChipBar({
   const hasAnyFilter = activeFilterCount > 0 || dateFilter;
 
   const toggleChipArray = (key: string, currentValues: string[], value: string) => {
-    const next = currentValues.includes(value)
+    const isRemoving = currentValues.includes(value);
+    const next = isRemoving
       ? currentValues.filter((v) => v !== value)
       : [...currentValues, value];
     onFilterChange(key, next);
+    pushEvent("calendar_filter_change", {
+      filter_type: key,
+      filter_value: value,
+      action: isRemoving ? "clear" : "apply",
+    });
   };
 
   return (
@@ -52,19 +60,28 @@ export default function FilterChipBar({
           <ChipButton
             label="This Weekend"
             active={dateFilter === "weekend"}
-            onClick={() => onDateFilterChange("weekend")}
+            onClick={() => {
+              onDateFilterChange("weekend");
+              pushEvent("calendar_filter_change", { filter_type: "date", filter_value: "weekend", action: dateFilter === "weekend" ? "clear" : "apply" });
+            }}
             activeColor="bg-[var(--color-charm)] text-white"
           />
           <ChipButton
             label="This Week"
             active={dateFilter === "this-week"}
-            onClick={() => onDateFilterChange("this-week")}
+            onClick={() => {
+              onDateFilterChange("this-week");
+              pushEvent("calendar_filter_change", { filter_type: "date", filter_value: "this-week", action: dateFilter === "this-week" ? "clear" : "apply" });
+            }}
             activeColor="bg-[var(--color-charm)] text-white"
           />
           <ChipButton
             label="This Month"
             active={dateFilter === "this-month"}
-            onClick={() => onDateFilterChange("this-month")}
+            onClick={() => {
+              onDateFilterChange("this-month");
+              pushEvent("calendar_filter_change", { filter_type: "date", filter_value: "this-month", action: dateFilter === "this-month" ? "clear" : "apply" });
+            }}
             activeColor="bg-[var(--color-charm)] text-white"
           />
           <div className="w-px h-6 bg-[var(--muted)]/30 flex-shrink-0" />
@@ -93,7 +110,10 @@ export default function FilterChipBar({
       <ChipButton
         label="Faith & Community"
         active={filters.includeFaith}
-        onClick={() => onFilterChange("includeFaith", !filters.includeFaith)}
+        onClick={() => {
+          onFilterChange("includeFaith", !filters.includeFaith);
+          pushEvent("calendar_filter_change", { filter_type: "includeFaith", filter_value: String(!filters.includeFaith), action: filters.includeFaith ? "clear" : "apply" });
+        }}
         activeColor="bg-[var(--color-calvert)] text-[var(--color-boh)]"
       />
 
@@ -134,7 +154,10 @@ export default function FilterChipBar({
         <>
           <div className="w-px h-6 bg-[var(--muted)]/30 flex-shrink-0" />
           <button
-            onClick={onClearFilters}
+            onClick={() => {
+              onClearFilters();
+              pushEvent("calendar_filter_change", { filter_type: "all", filter_value: "cleared", action: "clear" });
+            }}
             className="flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap text-[var(--color-charm)] hover:bg-[var(--color-charm)]/10 transition-all duration-150 flex-shrink-0"
           >
             <svg

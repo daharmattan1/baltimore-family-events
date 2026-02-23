@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, type FormEvent } from "react";
+import { pushEvent } from "@/lib/analytics";
 
 export default function SubscribePage() {
   const [email, setEmail] = useState("");
@@ -27,6 +28,7 @@ export default function SubscribePage() {
 
       setStatus("success");
       setEmail("");
+      pushEvent("subscribe_form_submit", { method: "beehiiv" });
     } catch (err) {
       setStatus("error");
       setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
