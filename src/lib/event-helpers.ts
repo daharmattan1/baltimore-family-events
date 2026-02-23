@@ -151,12 +151,39 @@ export function getVenueSourceBadgeColor(category?: string): string {
   }
 }
 
+// Deduplicate events by normalized title + date, keeping the highest-scored entry
+export function deduplicateEvents(
+  events: BaltimoreEvent[]
+): BaltimoreEvent[] {
+  const seen = new Map<string, BaltimoreEvent>();
+  for (const event of events) {
+    const normalizedTitle = (event.title || "")
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, " ");
+    const dateKey = event.event_date_start
+      ? event.event_date_start.split("T")[0]
+      : "no_date";
+    const dedupKey = `${normalizedTitle}|${dateKey}`;
+    const existing = seen.get(dedupKey);
+    if (
+      !existing ||
+      (event.family_friendly_score ?? 0) >
+        (existing.family_friendly_score ?? 0)
+    ) {
+      seen.set(dedupKey, event);
+    }
+  }
+  return Array.from(seen.values());
+}
+
 // Group events by date (YYYY-MM-DD key)
 export function groupEventsByDate(
   events: BaltimoreEvent[]
 ): Map<string, BaltimoreEvent[]> {
+  const deduplicated = deduplicateEvents(events);
   const grouped = new Map<string, BaltimoreEvent[]>();
-  for (const event of events) {
+  for (const event of deduplicated) {
     const dateKey = event.event_date_start
       ? event.event_date_start.split("T")[0]
       : "unknown";
