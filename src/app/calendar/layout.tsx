@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { fetchEvents } from "@/lib/supabase";
+import { generateEventJsonLd } from "@/lib/event-helpers";
 
 export const metadata: Metadata = {
   title: "Baltimore Family Events Calendar",
@@ -11,10 +13,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CalendarLayout({
+export default async function CalendarLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  let jsonLd: Record<string, unknown>[] = [];
+
+  try {
+    const events = await fetchEvents({ limit: 20 });
+    jsonLd = generateEventJsonLd(events);
+  } catch {
+    // Silently degrade — JSON-LD is progressive enhancement
+  }
+
+  return (
+    <>
+      {jsonLd.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      {children}
+    </>
+  );
 }
