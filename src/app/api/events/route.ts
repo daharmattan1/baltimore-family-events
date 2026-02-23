@@ -6,6 +6,7 @@ import {
   fetchFeaturedEvents,
   fetchWeekendEvents,
 } from "@/lib/supabase";
+import { deduplicateEvents } from "@/lib/event-helpers";
 
 const MAX_LIMIT = 200;
 const MAX_FEATURED_LIMIT = 12;
@@ -119,12 +120,12 @@ export async function GET(request: NextRequest) {
 
     if (parseBoolean(searchParams.get("featured"))) {
       const limit = parseLimit(searchParams.get("limit"), MAX_FEATURED_LIMIT) ?? 4;
-      const events = await fetchFeaturedEvents(limit);
+      const events = deduplicateEvents(await fetchFeaturedEvents(limit));
       return NextResponse.json({ events, count: events.length });
     }
 
     if (parseBoolean(searchParams.get("classes"))) {
-      const events = await fetchClasses();
+      const events = deduplicateEvents(await fetchClasses());
       return NextResponse.json({ events, count: events.length });
     }
 
@@ -132,10 +133,14 @@ export async function GET(request: NextRequest) {
 
     if (parseBoolean(searchParams.get("weekends"))) {
       const weekends = await fetchWeekendEvents(filters);
-      return NextResponse.json({ weekends });
+      const dedupedWeekends = weekends.map((w) => ({
+        ...w,
+        events: deduplicateEvents(w.events),
+      }));
+      return NextResponse.json({ weekends: dedupedWeekends });
     }
 
-    const events = await fetchEvents(filters);
+    const events = deduplicateEvents(await fetchEvents(filters));
     return NextResponse.json({
       events,
       count: events.length,
