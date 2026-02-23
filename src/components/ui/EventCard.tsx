@@ -1,4 +1,7 @@
+"use client";
+
 import { BaltimoreEvent } from "@/lib/supabase";
+import { pushEvent } from "@/lib/analytics";
 import {
   formatDate,
   getCostBadgeClass,
@@ -120,6 +123,12 @@ export default function EventCard({ event }: EventCardProps) {
           href={linkUrl}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => pushEvent("event_card_click", {
+            event_name: event.title,
+            event_date: event.event_date_start || "",
+            event_source: event.venue_source_category || "",
+            is_free: event.cost_type === "free",
+          })}
           className="relative inline-flex items-center text-sm font-medium text-[var(--color-crab)] hover:text-[var(--color-charm)] transition-colors duration-drift no-underline hover:no-underline"
         >
           View Details <span className="ml-1 group-hover:translate-x-1 transition-transform duration-drift">→</span>

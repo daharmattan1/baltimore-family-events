@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { pushEvent } from "@/lib/analytics";
 
 interface FilterDrawerProps {
   isOpen: boolean;
@@ -86,10 +87,16 @@ export default function FilterDrawer({
     filters.includeFaith;
 
   const toggleArrayValue = (key: string, currentValues: string[], value: string) => {
-    const next = currentValues.includes(value)
+    const isRemoving = currentValues.includes(value);
+    const next = isRemoving
       ? currentValues.filter((v) => v !== value)
       : [...currentValues, value];
     onFilterChange(key, next);
+    pushEvent("calendar_filter_change", {
+      filter_type: key,
+      filter_value: value,
+      action: isRemoving ? "clear" : "apply",
+    });
   };
 
   if (!isOpen) return null;
@@ -167,7 +174,10 @@ export default function FilterDrawer({
                     ? "bg-[var(--color-calvert)]"
                     : "bg-[var(--muted)]/30"
                 }`}
-                onClick={() => onFilterChange("includeFaith", !filters.includeFaith)}
+                onClick={() => {
+                  onFilterChange("includeFaith", !filters.includeFaith);
+                  pushEvent("calendar_filter_change", { filter_type: "includeFaith", filter_value: String(!filters.includeFaith), action: filters.includeFaith ? "clear" : "apply" });
+                }}
                 role="switch"
                 aria-checked={filters.includeFaith}
               >
@@ -188,7 +198,10 @@ export default function FilterDrawer({
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-t border-[var(--muted)]/20">
           {hasActiveFilters ? (
             <button
-              onClick={onClearFilters}
+              onClick={() => {
+                onClearFilters();
+                pushEvent("calendar_filter_change", { filter_type: "all", filter_value: "cleared", action: "clear" });
+              }}
               className="text-sm text-[var(--color-charm)] hover:underline font-medium"
             >
               Clear All Filters
