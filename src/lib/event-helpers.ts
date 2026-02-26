@@ -175,11 +175,13 @@ function getSignificantWords(title: string): Set<string> {
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, "")
       .split(/\s+/)
+      .map((w) => w.replace(/s$/, "")) // naive stemming: strip trailing s
       .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
   );
 }
 
-// Check if two titles are semantically similar (>60% word overlap)
+// Check if two titles are semantically similar (>50% word overlap).
+// Threshold is intentionally moderate since this is gated behind same venue + same date.
 function titlesAreSimilar(a: string, b: string): boolean {
   const wordsA = getSignificantWords(a);
   const wordsB = getSignificantWords(b);
@@ -189,7 +191,7 @@ function titlesAreSimilar(a: string, b: string): boolean {
     if (wordsB.has(w)) overlap++;
   }
   const smaller = Math.min(wordsA.size, wordsB.size);
-  return overlap / smaller >= 0.6;
+  return overlap / smaller >= 0.5;
 }
 
 // Deduplicate events, keeping the highest-scored entry.
