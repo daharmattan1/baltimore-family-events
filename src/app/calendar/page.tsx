@@ -141,32 +141,48 @@ export default function CalendarPage() {
     return grouped.get(selectedDay) || [];
   }, [selectedDay, events]);
 
+  // Format a local Date as YYYY-MM-DD without UTC conversion.
+  // toISOString() converts to UTC which can shift the date by ±1 day.
+  const toLocalDateStr = (d: Date): string => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   // Date filter helpers (for list view)
   const getDateRange = (preset: string): { start: string; end: string } | null => {
     const today = new Date();
     const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
 
     if (preset === "weekend") {
+      // Find this coming Saturday (or today if already Sat/Sun)
       const saturday = new Date(today);
-      saturday.setDate(today.getDate() + (6 - dayOfWeek));
+      if (dayOfWeek === 0) {
+        // Sunday: go back 1 day to Saturday
+        saturday.setDate(today.getDate() - 1);
+      } else if (dayOfWeek !== 6) {
+        // Mon-Fri: go forward to Saturday
+        saturday.setDate(today.getDate() + (6 - dayOfWeek));
+      }
       const sunday = new Date(saturday);
       sunday.setDate(saturday.getDate() + 1);
       return {
-        start: saturday.toISOString().split("T")[0],
-        end: sunday.toISOString().split("T")[0],
+        start: toLocalDateStr(saturday),
+        end: toLocalDateStr(sunday),
       };
     } else if (preset === "this-week") {
       const endOfWeek = new Date(today);
       endOfWeek.setDate(today.getDate() + (7 - dayOfWeek));
       return {
-        start: today.toISOString().split("T")[0],
-        end: endOfWeek.toISOString().split("T")[0],
+        start: toLocalDateStr(today),
+        end: toLocalDateStr(endOfWeek),
       };
     } else if (preset === "this-month") {
       const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
       return {
-        start: today.toISOString().split("T")[0],
-        end: endOfMonth.toISOString().split("T")[0],
+        start: toLocalDateStr(today),
+        end: toLocalDateStr(endOfMonth),
       };
     }
     return null;

@@ -110,11 +110,19 @@ export interface EventFilters {
   limit?: number;
 }
 
+// Format a Date as YYYY-MM-DD in local time (avoids UTC shift from toISOString)
+function toLocalDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 // Fetch events with optional filters
 // Note: baltimore schema is set at client initialization
 export async function fetchEvents(filters: EventFilters = {}) {
   const supabase = getSupabase();
-  const today = new Date().toISOString().split("T")[0];
+  const today = toLocalDateStr(new Date());
 
   let query = supabase
     .from("baltimore_events")
@@ -180,8 +188,10 @@ export async function fetchEvents(filters: EventFilters = {}) {
 // Only shows events within the next 7 days
 export async function fetchFeaturedEvents(limit = 4) {
   const supabase = getSupabase();
-  const today = new Date().toISOString().split("T")[0];
-  const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const today = toLocalDateStr(new Date());
+  const nextWeekDate = new Date();
+  nextWeekDate.setDate(nextWeekDate.getDate() + 7);
+  const nextWeek = toLocalDateStr(nextWeekDate);
 
   // First try to get events marked as featured (within next 7 days)
   const { data: featuredData, error: featuredError } = await supabase
@@ -259,8 +269,8 @@ export async function fetchWeekendEvents(filters: EventFilters = {}) {
     const sunday = new Date(friday);
     sunday.setDate(friday.getDate() + 2);
     weekends.push({
-      start: friday.toISOString().split("T")[0],
-      end: sunday.toISOString().split("T")[0],
+      start: toLocalDateStr(friday),
+      end: toLocalDateStr(sunday),
     });
   }
 
@@ -274,7 +284,7 @@ export async function fetchWeekendEvents(filters: EventFilters = {}) {
     .eq("is_relevant", true)
     .in("moderation_status", ["auto_approved", "approved"])
     .not("event_type", "in", '("class","camp")')
-    .gte("event_date_start", overallStart < today.toISOString().split("T")[0] ? today.toISOString().split("T")[0] : overallStart)
+    .gte("event_date_start", overallStart < toLocalDateStr(today) ? toLocalDateStr(today) : overallStart)
     .lte("event_date_start", overallEnd)
     .order("event_date_start", { ascending: true })
     .limit(200);
@@ -360,7 +370,7 @@ export async function fetchVenues() {
 // Fetch classes and camps (registration-required activities)
 export async function fetchClasses() {
   const supabase = getSupabase();
-  const today = new Date().toISOString().split("T")[0];
+  const today = toLocalDateStr(new Date());
 
   const { data, error } = await supabase
     .from("baltimore_events")

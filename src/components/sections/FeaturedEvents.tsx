@@ -30,10 +30,11 @@ function getEventTypeIcon(eventType?: string): string {
   }
 }
 
-// Format date for display
+// Format date for display — timezone-safe
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "Date TBD";
-  const date = new Date(dateStr);
+  const [y, m, d] = dateStr.split("T")[0].split("-").map(Number);
+  const date = new Date(y, m - 1, d, 12, 0, 0);
   return date.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",

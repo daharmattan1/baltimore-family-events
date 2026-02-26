@@ -20,7 +20,7 @@ function formatWeekendLabel(start: string, end: string): string {
 
   // Check if this is the current weekend
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   if (todayStr >= start && todayStr <= end) {
     return `This Weekend — ${month} ${friDay}–${sunDay}`;
   }
@@ -41,7 +41,7 @@ export default function WeekendSection({ start, end, events, defaultOpen = false
   const friday = start;
   const satDate = new Date(start + "T12:00:00");
   satDate.setDate(satDate.getDate() + 1);
-  const saturday = satDate.toISOString().split("T")[0];
+  const saturday = `${satDate.getFullYear()}-${String(satDate.getMonth() + 1).padStart(2, "0")}-${String(satDate.getDate()).padStart(2, "0")}`;
   const sunday = end;
 
   const days = [

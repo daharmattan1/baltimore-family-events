@@ -1,9 +1,19 @@
 import { BaltimoreEvent } from "@/lib/supabase";
 
-// Format date for display
+// Parse a YYYY-MM-DD string into year/month/day without timezone shifting.
+// new Date("2026-03-01") interprets as UTC midnight, which in US timezones
+// shifts back to the previous day. This helper avoids that entirely.
+function parseDateParts(dateStr: string): { year: number; month: number; day: number } {
+  const [year, month, day] = dateStr.split("T")[0].split("-").map(Number);
+  return { year, month, day };
+}
+
+// Format date for display — timezone-safe
 export function formatDate(dateStr?: string): string {
   if (!dateStr) return "Date TBD";
-  const date = new Date(dateStr);
+  const { year, month, day } = parseDateParts(dateStr);
+  // Create date using local timezone (noon to avoid any DST edge cases)
+  const date = new Date(year, month - 1, day, 12, 0, 0);
   return date.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -151,10 +161,43 @@ export function getVenueSourceBadgeColor(category?: string): string {
   }
 }
 
-// Deduplicate events by normalized title + date, keeping the highest-scored entry
+// Extract significant words from a title (skip common filler words)
+const STOP_WORDS = new Set([
+  "a", "an", "the", "at", "in", "on", "for", "of", "and", "or", "to", "with",
+  "is", "are", "was", "by", "from", "its", "their", "this", "that", "it",
+  "special", "event", "events", "activities", "activity", "programming",
+  "celebration", "celebrating", "day", "program", "session",
+]);
+
+function getSignificantWords(title: string): Set<string> {
+  return new Set(
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, "")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+  );
+}
+
+// Check if two titles are semantically similar (>60% word overlap)
+function titlesAreSimilar(a: string, b: string): boolean {
+  const wordsA = getSignificantWords(a);
+  const wordsB = getSignificantWords(b);
+  if (wordsA.size === 0 || wordsB.size === 0) return false;
+  let overlap = 0;
+  for (const w of wordsA) {
+    if (wordsB.has(w)) overlap++;
+  }
+  const smaller = Math.min(wordsA.size, wordsB.size);
+  return overlap / smaller >= 0.6;
+}
+
+// Deduplicate events, keeping the highest-scored entry.
+// Two passes: (1) exact normalized title+date, (2) same venue+date with similar titles.
 export function deduplicateEvents(
   events: BaltimoreEvent[]
 ): BaltimoreEvent[] {
+  // Pass 1: exact title + date dedup
   const seen = new Map<string, BaltimoreEvent>();
   for (const event of events) {
     const normalizedTitle = (event.title || "")
@@ -174,7 +217,50 @@ export function deduplicateEvents(
       seen.set(dedupKey, event);
     }
   }
-  return Array.from(seen.values());
+  const afterExact = Array.from(seen.values());
+
+  // Pass 2: fuzzy dedup — same venue + same date + similar title
+  const result: BaltimoreEvent[] = [];
+  for (const event of afterExact) {
+    const dateKey = event.event_date_start
+      ? event.event_date_start.split("T")[0]
+      : "no_date";
+    const venue = (event.venue || "").toLowerCase().trim();
+
+    // Skip fuzzy matching if no venue (can't confidently dedup without it)
+    if (!venue) {
+      result.push(event);
+      continue;
+    }
+
+    const duplicate = result.find((existing) => {
+      const existingDate = existing.event_date_start
+        ? existing.event_date_start.split("T")[0]
+        : "no_date";
+      const existingVenue = (existing.venue || "").toLowerCase().trim();
+      return (
+        dateKey === existingDate &&
+        venue === existingVenue &&
+        titlesAreSimilar(event.title || "", existing.title || "")
+      );
+    });
+
+    if (duplicate) {
+      // Keep the one with the higher score
+      if (
+        (event.family_friendly_score ?? 0) >
+        (duplicate.family_friendly_score ?? 0)
+      ) {
+        const idx = result.indexOf(duplicate);
+        result[idx] = event;
+      }
+      // Otherwise skip this event (duplicate with lower score)
+    } else {
+      result.push(event);
+    }
+  }
+
+  return result;
 }
 
 // Group events by date (YYYY-MM-DD key)
