@@ -58,6 +58,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/behind-the-scenes" className="text-gray-400 hover:text-[var(--color-crab)] transition-colors duration-drift no-underline hover:no-underline">
+                  Behind the Scenes
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy" className="text-gray-400 hover:text-[var(--color-crab)] transition-colors duration-drift no-underline hover:no-underline">
                   Privacy Policy
                 </Link>

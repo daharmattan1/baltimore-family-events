@@ -10,7 +10,6 @@ const navLinks = [
   // { href: "/classes", label: "Classes & Sign-Ups" },  // Beta - not yet ready for production
   // { href: "/places", label: "Places" },                // Beta - not yet ready for production
   { href: "/newsletter", label: "Newsletter" },
-  { href: "/behind-the-scenes", label: "Behind the Scenes" },
   { href: "/about", label: "About" },
 ];
 

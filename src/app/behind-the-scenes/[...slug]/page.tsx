@@ -25,10 +25,10 @@ export async function generateMetadata({
   if (!transcript) return { title: "Behind the Scenes" };
 
   return {
-    title: `${transcript.title} — Agent Discussion | BmoreFamilies`,
-    description: `Watch 5 AI agents debate Baltimore family events for ${transcript.dateRange || "this weekend"}. ${transcript.rounds} rounds of picks, pushback, and consensus.`,
+    title: `How We Picked Events for ${transcript.dateRange || "This Week"} — Agent Transcript | BmoreFamilies`,
+    description: `Curious how the ${transcript.dateRange || "this week's"} newsletter was created? Watch 5 AI agents debate Baltimore family events across ${transcript.rounds} rounds of picks, pushback, and consensus.`,
     openGraph: {
-      title: `${transcript.title} — Behind the Scenes`,
+      title: `How We Picked Events for ${transcript.dateRange || "This Week"} — Agent Transcript`,
       description: `5 AI agents debate Baltimore family events for ${transcript.dateRange || "this weekend"}.`,
     },
   };
@@ -65,19 +65,20 @@ export default async function TranscriptDetailPage({ params }: PageProps) {
         href="/behind-the-scenes"
         className="inline-flex items-center text-[var(--color-charm)] hover:text-[var(--color-crab)] mb-8 no-underline transition-colors"
       >
-        ← Back to Behind the Scenes
+        ← All Agent Transcripts
       </Link>
 
       {/* Header */}
       <header className="mb-8">
+        <p className="text-[var(--color-charm)] font-medium mb-2 tracking-wide uppercase text-sm">
+          Agent Transcript
+        </p>
         <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-2">
-          {transcript.title}
+          How We Picked Events for {transcript.dateRange || "This Week"}
         </h1>
-        {transcript.dateRange && (
-          <p className="text-lg text-[var(--color-harbor)] mb-3">
-            Events for {transcript.dateRange}
-          </p>
-        )}
+        <p className="text-lg text-[var(--color-harbor)] mb-4 leading-relaxed">
+          Interested in how the newsletter{transcript.dateRange ? ` for ${transcript.dateRange}` : ""} was created? Here are the {transcript.agents.length} AI agents debating the calendar and coming up with the top recommendations.
+        </p>
 
         {/* Agent roster */}
         <div className="flex flex-wrap gap-2 mb-3">

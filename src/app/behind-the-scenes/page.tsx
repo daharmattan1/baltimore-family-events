@@ -4,9 +4,9 @@ import { getAllTranscripts } from "@/lib/transcripts";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Behind the Scenes | BmoreFamilies",
+  title: "How We Pick Events — Agent Transcripts | BmoreFamilies",
   description:
-    "Watch our 5 AI agents debate which events make the cut each week. Read the full transcripts of their discussions.",
+    "Curious how our AI agents decide which Baltimore family events make the newsletter? Read the full debate transcripts from each week's curation process.",
 };
 
 // Extract a preview snippet from transcript content
@@ -54,13 +54,13 @@ export default function BehindTheScenesPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-[var(--color-charm)] font-medium mb-2 tracking-wide uppercase text-sm">
-            The Debate
+            How We Pick Events
           </p>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-boh)] mb-3">
-            Behind the Scenes
+            Agent Debate Transcripts
           </h1>
           <p className="text-[var(--color-harbor)] max-w-2xl">
-            Watch our 5 AI agents debate which events make the cut each week. Every pick is argued, challenged, and refined before it reaches your inbox.
+            Ever wonder how the newsletter gets made? Each week, 5 AI agents with different parenting styles debate hundreds of events to find the best picks. Here are the unedited transcripts.
           </p>
         </div>
 
@@ -100,11 +100,11 @@ export default function BehindTheScenesPage() {
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <h2 className="text-lg font-display font-semibold text-[var(--color-boh)] mb-1">
-                      {transcript.title}
+                      How We Picked: {transcript.title}
                     </h2>
                     {transcript.dateRange && (
                       <p className="text-sm text-[var(--muted)]">
-                        {transcript.dateRange}
+                        Week of {transcript.dateRange}
                       </p>
                     )}
                   </div>
