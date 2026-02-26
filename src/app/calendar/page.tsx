@@ -81,14 +81,21 @@ export default function CalendarPage() {
         setEvents(data.events || []);
         setWeekendGroups([]);
       } else {
-        // List view
+        // List view — default to next 30 days when no date filter
         if (dateFilter) {
           const range = getDateRange(dateFilter);
           if (range) {
             params.set("startDate", range.start);
             params.set("endDate", range.end);
           }
+        } else {
+          const today = new Date();
+          const thirtyDaysOut = new Date(today);
+          thirtyDaysOut.setDate(today.getDate() + 30);
+          params.set("startDate", toLocalDateStr(today));
+          params.set("endDate", toLocalDateStr(thirtyDaysOut));
         }
+        params.set("limit", "200");
         const response = await fetch(`/api/events?${params.toString()}`);
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Failed to fetch events");
@@ -373,7 +380,7 @@ export default function CalendarPage() {
           <>
             <p className="text-sm text-[var(--muted)] mb-4 flex items-center gap-2">
               <span className="text-[var(--color-crab)]">🦀</span>
-              Showing {Math.min(visibleCount, events.length)} of {events.length} event{events.length !== 1 ? "s" : ""}
+              {events.length} event{events.length !== 1 ? "s" : ""} in the next {dateFilter === "weekend" ? "weekend" : dateFilter === "this-week" ? "week" : dateFilter === "this-month" ? "month" : "30 days"}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.slice(0, visibleCount).map((event) => (

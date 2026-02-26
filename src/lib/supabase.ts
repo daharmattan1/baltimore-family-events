@@ -132,12 +132,11 @@ export async function fetchEvents(filters: EventFilters = {}) {
     .not("event_type", "in", '("class","camp")')
     .order("event_date_start", { ascending: true });
 
-  // Date range filter
+  // Date range filter — always default to today so past events never appear
   if (filters.startDate) {
     query = query.gte("event_date_start", filters.startDate);
   } else {
-    // Keep recurring entries visible even when their original start date is in the past.
-    query = query.or(`event_date_start.gte.${today},is_recurring.eq.true`);
+    query = query.gte("event_date_start", today);
   }
 
   if (filters.endDate) {
@@ -378,7 +377,7 @@ export async function fetchClasses() {
     .eq("is_relevant", true)
     .in("moderation_status", ["auto_approved", "approved"])
     .in("event_type", ["class", "camp"])
-    .or(`event_date_start.gte.${today},is_recurring.eq.true`)
+    .gte("event_date_start", today)
     .order("event_date_start", { ascending: true })
     .limit(100);
 
