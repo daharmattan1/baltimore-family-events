@@ -180,18 +180,63 @@ function getSignificantWords(title: string): Set<string> {
   );
 }
 
-// Check if two titles are semantically similar (>50% word overlap).
-// Threshold is intentionally moderate since this is gated behind same venue + same date.
-function titlesAreSimilar(a: string, b: string): boolean {
-  const wordsA = getSignificantWords(a);
-  const wordsB = getSignificantWords(b);
+// Normalize a title for comparison: lowercase, strip punctuation, collapse whitespace
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Strip venue name from a title to avoid inflated word counts.
+// Many titles embed the venue name (e.g., "Walters Art Museum Drop-in Art Making").
+function stripVenueName(title: string, venue: string): string {
+  if (!venue) return title;
+  const normalizedVenue = normalizeTitle(venue);
+  const normalizedTitle = normalizeTitle(title);
+  // Remove the venue name (and common prefixes like "the") from the title
+  const venueWithoutThe = normalizedVenue.replace(/^the\s+/, "");
+  let stripped = normalizedTitle
+    .replace(normalizedVenue, "")
+    .replace(venueWithoutThe, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return stripped || normalizedTitle; // fallback to original if stripping removes everything
+}
+
+// Check if one title is a prefix of the other (after normalization).
+// Catches patterns like "Pi(e) Day" vs "Pi(e) Day celebration combining math..."
+function titleIsPrefixOf(a: string, b: string): boolean {
+  const normA = normalizeTitle(a);
+  const normB = normalizeTitle(b);
+  if (normA.length === 0 || normB.length === 0) return false;
+  const shorter = normA.length <= normB.length ? normA : normB;
+  const longer = normA.length <= normB.length ? normB : normA;
+  // Shorter must be at least 40% the length of the longer to count as a prefix match
+  if (shorter.length / longer.length < 0.4) return false;
+  return longer.startsWith(shorter);
+}
+
+// Check if two titles are semantically similar (≥35% word overlap) or one is a prefix of the other.
+// Threshold lowered from 50% because this is gated behind same venue + same date.
+function titlesAreSimilar(a: string, b: string, venue?: string): boolean {
+  // Quick prefix check first
+  if (titleIsPrefixOf(a, b)) return true;
+
+  // Strip venue name before word comparison to avoid inflated overlap
+  const cleanA = venue ? stripVenueName(a, venue) : a;
+  const cleanB = venue ? stripVenueName(b, venue) : b;
+
+  const wordsA = getSignificantWords(cleanA);
+  const wordsB = getSignificantWords(cleanB);
   if (wordsA.size === 0 || wordsB.size === 0) return false;
   let overlap = 0;
   for (const w of wordsA) {
     if (wordsB.has(w)) overlap++;
   }
   const smaller = Math.min(wordsA.size, wordsB.size);
-  return overlap / smaller >= 0.5;
+  return overlap / smaller >= 0.35;
 }
 
 // Deduplicate events, keeping the highest-scored entry.
@@ -243,7 +288,7 @@ export function deduplicateEvents(
       return (
         dateKey === existingDate &&
         venue === existingVenue &&
-        titlesAreSimilar(event.title || "", existing.title || "")
+        titlesAreSimilar(event.title || "", existing.title || "", event.venue || "")
       );
     });
 
@@ -364,6 +409,147 @@ export function generateEventJsonLd(events: BaltimoreEvent[]) {
 
       return jsonLd;
     });
+}
+
+// --- Venue Grouping ---
+
+// A group of events at the same venue on the same day
+export interface VenueGroup {
+  type: "venue-group";
+  venue: string;
+  date: string; // YYYY-MM-DD
+  events: BaltimoreEvent[];
+  sharedBadges: {
+    costType: "free" | "paid" | "mixed";
+    ageRange: string | "mixed";
+    venueType: string | null;
+    venueSourceCategory: string | null;
+  };
+  dominantEventType: string;
+}
+
+// A single event or a venue group — used as the render item type
+export type GroupedItem = BaltimoreEvent | VenueGroup;
+
+export function isVenueGroup(item: GroupedItem): item is VenueGroup {
+  return (item as VenueGroup).type === "venue-group";
+}
+
+// Compute shared badges for a group of events
+function computeSharedBadges(events: BaltimoreEvent[]): VenueGroup["sharedBadges"] {
+  const costTypes = new Set(events.map((e) => e.cost_type).filter(Boolean));
+  const ageRanges = new Set(events.map((e) => e.age_range_category).filter(Boolean));
+  const venueTypes = new Set(events.map((e) => e.venue_type).filter(Boolean));
+  const venueSourceCategories = new Set(events.map((e) => e.venue_source_category).filter(Boolean));
+
+  return {
+    costType:
+      costTypes.size === 1 && costTypes.has("free")
+        ? "free"
+        : costTypes.size === 1 && costTypes.has("paid")
+          ? "paid"
+          : "mixed",
+    ageRange: ageRanges.size === 1 ? (ageRanges.values().next().value ?? "mixed") : "mixed",
+    venueType: venueTypes.size === 1 ? (venueTypes.values().next().value ?? null) : null,
+    venueSourceCategory: venueSourceCategories.size === 1
+      ? (venueSourceCategories.values().next().value ?? null)
+      : null,
+  };
+}
+
+// Get the most common event_type in a group (mode)
+function getDominantEventType(events: BaltimoreEvent[]): string {
+  const counts = new Map<string, number>();
+  for (const e of events) {
+    const t = e.event_type || "other";
+    counts.set(t, (counts.get(t) || 0) + 1);
+  }
+  let maxType = "other";
+  let maxCount = 0;
+  for (const [type, count] of counts) {
+    if (count > maxCount) {
+      maxCount = count;
+      maxType = type;
+    }
+  }
+  return maxType;
+}
+
+// Group events by venue+date. Events at the same venue on the same day
+// with `threshold` or more entries are collapsed into a VenueGroup.
+// Returns a mixed array preserving chronological order (groups appear
+// at the position of their first event).
+export function groupEventsByVenue(
+  events: BaltimoreEvent[],
+  threshold: number = 3
+): GroupedItem[] {
+  // Build a map of (venue+date) → events
+  const clusterMap = new Map<string, BaltimoreEvent[]>();
+  const clusterOrder = new Map<string, number>(); // track first-seen index
+
+  for (let i = 0; i < events.length; i++) {
+    const venue = (events[i].venue || "").trim();
+    const date = events[i].event_date_start
+      ? events[i].event_date_start!.split("T")[0]
+      : "unknown";
+
+    if (!venue) {
+      // No venue — can't group, will be handled as singleton
+      continue;
+    }
+
+    const key = `${venue.toLowerCase()}|${date}`;
+    if (!clusterMap.has(key)) {
+      clusterMap.set(key, []);
+      clusterOrder.set(key, i);
+    }
+    clusterMap.get(key)!.push(events[i]);
+  }
+
+  // Determine which clusters qualify for grouping
+  const groupedKeys = new Set<string>();
+  for (const [key, cluster] of clusterMap) {
+    if (cluster.length >= threshold) {
+      groupedKeys.add(key);
+    }
+  }
+
+  // Build result array preserving original order
+  const result: GroupedItem[] = [];
+  const emitted = new Set<string>(); // track which group keys have been emitted
+
+  for (const event of events) {
+    const venue = (event.venue || "").trim();
+    const date = event.event_date_start
+      ? event.event_date_start.split("T")[0]
+      : "unknown";
+    const key = venue ? `${venue.toLowerCase()}|${date}` : "";
+
+    if (groupedKeys.has(key)) {
+      // This event belongs to a group — emit the group at the first event's position
+      if (!emitted.has(key)) {
+        emitted.add(key);
+        const cluster = clusterMap.get(key)!;
+        result.push({
+          type: "venue-group",
+          venue: cluster[0].venue || venue,
+          date,
+          events: cluster.sort(
+            (a, b) =>
+              (b.family_friendly_score ?? 0) - (a.family_friendly_score ?? 0)
+          ),
+          sharedBadges: computeSharedBadges(cluster),
+          dominantEventType: getDominantEventType(cluster),
+        });
+      }
+      // Skip individual events that are part of a group
+    } else {
+      // Singleton — pass through as-is
+      result.push(event);
+    }
+  }
+
+  return result;
 }
 
 // Get human-readable label for event_type

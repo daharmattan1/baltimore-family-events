@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import EventDrawerCard from "@/components/ui/EventDrawerCard";
+import VenueGroupRow from "@/components/ui/VenueGroupRow";
 import { groupEventsByType, getEventTypeLabel, getEventTypeIcon } from "@/lib/event-helpers";
 import type { BaltimoreEvent } from "@/lib/supabase";
 
@@ -66,7 +67,75 @@ export default function EventDrawer({
 
   const dateLabel = selectedDate ? formatDrawerDate(selectedDate) : "";
   const eventCount = events.length;
-  const useGroupedView = eventCount >= 10;
+
+  // Check if any venue has 3+ events — if so, use venue grouping
+  const venueCounts = new Map<string, BaltimoreEvent[]>();
+  for (const e of events) {
+    const v = (e.venue || "").toLowerCase().trim();
+    if (!v) continue;
+    if (!venueCounts.has(v)) venueCounts.set(v, []);
+    venueCounts.get(v)!.push(e);
+  }
+  const hasVenueClusters = Array.from(venueCounts.values()).some((g) => g.length >= 3);
+  const useGroupedView = !hasVenueClusters && eventCount >= 10;
+
+  // Render venue-grouped view (when venue clusters exist)
+  const renderVenueGroupedEvents = () => {
+    // Separate clustered venues (3+) from singletons
+    const venueGroups: { venue: string; events: BaltimoreEvent[] }[] = [];
+    const ungrouped: BaltimoreEvent[] = [];
+    const processed = new Set<number>();
+
+    for (const [, group] of venueCounts) {
+      if (group.length >= 3) {
+        venueGroups.push({
+          venue: group[0].venue || "",
+          events: group.sort(
+            (a, b) => (b.family_friendly_score ?? 0) - (a.family_friendly_score ?? 0)
+          ),
+        });
+        for (const e of group) processed.add(e.id);
+      }
+    }
+    for (const e of events) {
+      if (!processed.has(e.id)) ungrouped.push(e);
+    }
+
+    return (
+      <div className="space-y-5">
+        {venueGroups.map((vg) => (
+          <div key={vg.venue}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-base">📍</span>
+              <h4 className="font-display text-sm font-semibold text-[var(--color-boh)]">
+                {vg.venue}
+              </h4>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-crab)]/10 text-[var(--color-crab)]">
+                {vg.events.length}
+              </span>
+            </div>
+            <div className="bg-[var(--color-formstone)]/50 rounded-lg p-2">
+              {vg.events.map((event) => (
+                <VenueGroupRow
+                  key={event.id}
+                  event={event}
+                  venueName={vg.venue}
+                  groupEventCount={vg.events.length}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+        {ungrouped.length > 0 && (
+          <div className="space-y-2">
+            {ungrouped.map((event) => (
+              <EventDrawerCard key={event.id} event={event} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Render grouped view
   const renderGroupedEvents = () => {
@@ -160,6 +229,7 @@ export default function EventDrawer({
             </h3>
             <p className="text-xs text-[var(--muted)]">
               {eventCount} event{eventCount !== 1 ? "s" : ""}
+              {hasVenueClusters && " · grouped by venue"}
               {useGroupedView && " · grouped by type"}
             </p>
           </div>
@@ -177,7 +247,11 @@ export default function EventDrawer({
         {/* Event list */}
         <div className="overflow-y-auto px-4 sm:px-5 py-4" style={{ maxHeight: "calc(70vh - 80px)" }}>
           {eventCount > 0 ? (
-            useGroupedView ? renderGroupedEvents() : renderFlatEvents()
+            hasVenueClusters
+              ? renderVenueGroupedEvents()
+              : useGroupedView
+                ? renderGroupedEvents()
+                : renderFlatEvents()
           ) : (
             <div className="text-center py-8">
               <div className="text-3xl mb-3">🦀</div>

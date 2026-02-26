@@ -20,11 +20,25 @@ type EventCardClickPayload = {
   is_free: boolean;
 };
 
+type VenueGroupPayload = {
+  venue_name: string;
+  event_count: number;
+};
+
+type VenueGroupEventClickPayload = {
+  venue_name: string;
+  event_count: number;
+  clicked_event: string;
+};
+
 type AnalyticsEventMap = {
   subscribe_form_submit: SubscribeFormSubmitPayload;
   calendar_filter_change: CalendarFilterChangePayload;
   newsletter_click: NewsletterClickPayload;
   event_card_click: EventCardClickPayload;
+  venue_group_expand: VenueGroupPayload;
+  venue_group_collapse: VenueGroupPayload;
+  venue_group_event_click: VenueGroupEventClickPayload;
 };
 
 type AnalyticsEvent = keyof AnalyticsEventMap;

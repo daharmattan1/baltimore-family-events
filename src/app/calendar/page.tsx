@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import EventCard from "@/components/ui/EventCard";
+import VenueGroupCard from "@/components/ui/VenueGroupCard";
 import FilterChipBar from "@/components/ui/FilterChipBar";
 import FilterDrawer from "@/components/ui/FilterDrawer";
 import ViewToggle from "@/components/ui/ViewToggle";
@@ -10,7 +11,7 @@ import CalendarGrid from "@/components/ui/CalendarGrid";
 import EventDrawer from "@/components/ui/EventDrawer";
 import WeekendSection from "@/components/ui/WeekendSection";
 import { useCalendarNavigation } from "@/hooks/useCalendarNavigation";
-import { groupEventsByDate } from "@/lib/event-helpers";
+import { groupEventsByDate, groupEventsByVenue, isVenueGroup } from "@/lib/event-helpers";
 import { BaltimoreEvent } from "@/lib/supabase";
 
 interface WeekendGroup {
@@ -147,6 +148,9 @@ export default function CalendarPage() {
     const grouped = groupEventsByDate(events);
     return grouped.get(selectedDay) || [];
   }, [selectedDay, events]);
+
+  // Grouped items for list view (venue grouping applied)
+  const groupedListItems = useMemo(() => groupEventsByVenue(events), [events]);
 
   // Format a local Date as YYYY-MM-DD without UTC conversion.
   // toISOString() converts to UTC which can shift the date by ±1 day.
@@ -383,11 +387,15 @@ export default function CalendarPage() {
               {events.length} event{events.length !== 1 ? "s" : ""} in the next {dateFilter === "weekend" ? "weekend" : dateFilter === "this-week" ? "week" : dateFilter === "this-month" ? "month" : "30 days"}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.slice(0, visibleCount).map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+              {groupedListItems.slice(0, visibleCount).map((item) =>
+                isVenueGroup(item) ? (
+                  <VenueGroupCard key={`vg-${item.venue}-${item.date}`} group={item} />
+                ) : (
+                  <EventCard key={item.id} event={item} />
+                )
+              )}
             </div>
-            {visibleCount < events.length && (
+            {groupedListItems.length > visibleCount && (
               <div className="text-center mt-8">
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 12)}

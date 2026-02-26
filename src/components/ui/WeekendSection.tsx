@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import EventCard from "@/components/ui/EventCard";
+import VenueGroupCard from "@/components/ui/VenueGroupCard";
 import { BaltimoreEvent } from "@/lib/supabase";
+import { groupEventsByVenue, isVenueGroup } from "@/lib/event-helpers";
 
 interface WeekendSectionProps {
   start: string;
@@ -88,9 +90,13 @@ export default function WeekendSection({ start, end, events, defaultOpen = false
                 {day.label}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {day.events.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
+                {groupEventsByVenue(day.events).map((item) =>
+                  isVenueGroup(item) ? (
+                    <VenueGroupCard key={`vg-${item.venue}-${item.date}`} group={item} />
+                  ) : (
+                    <EventCard key={item.id} event={item} />
+                  )
+                )}
               </div>
             </div>
           ))}
