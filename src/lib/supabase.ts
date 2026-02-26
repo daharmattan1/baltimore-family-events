@@ -149,7 +149,14 @@ export async function fetchEvents(filters: EventFilters = {}) {
   }
 
   if (filters.ageRange && filters.ageRange.length > 0) {
-    query = query.in("age_range_category", filters.ageRange);
+    // Include selected ages + "all_ages" events + un-categorized (NULL) events
+    const quoted = filters.ageRange.map((v) => `"${v}"`).join(",");
+    const allAgesIncluded = filters.ageRange.includes("all_ages");
+    const orClauses = [
+      `age_range_category.in.(${quoted}${allAgesIncluded ? "" : ',"all_ages"'})`,
+      "age_range_category.is.null",
+    ];
+    query = query.or(orClauses.join(","));
   }
 
   if (filters.costType && filters.costType.length > 0) {
@@ -293,7 +300,14 @@ export async function fetchWeekendEvents(filters: EventFilters = {}) {
     query = query.in("event_type", filters.eventType);
   }
   if (filters.ageRange && filters.ageRange.length > 0) {
-    query = query.in("age_range_category", filters.ageRange);
+    // Include selected ages + "all_ages" events + un-categorized (NULL) events
+    const quoted = filters.ageRange.map((v) => `"${v}"`).join(",");
+    const allAgesIncluded = filters.ageRange.includes("all_ages");
+    const orClauses = [
+      `age_range_category.in.(${quoted}${allAgesIncluded ? "" : ',"all_ages"'})`,
+      "age_range_category.is.null",
+    ];
+    query = query.or(orClauses.join(","));
   }
   if (filters.costType && filters.costType.length > 0) {
     query = query.in("cost_type", filters.costType);
