@@ -160,9 +160,9 @@ export async function fetchEvents(filters: EventFilters = {}) {
     query = query.in("location_area", filters.locationArea);
   }
 
-  // Faith & Community toggle: when OFF (default), exclude faith_community events
-  if (!filters.includeFaith) {
-    query = query.or("audience_openness.is.null,audience_openness.eq.open_to_all");
+  // Faith & Community filter: when active, show ONLY faith_community events
+  if (filters.includeFaith) {
+    query = query.eq("audience_openness", "faith_community");
   }
 
   // Limit
@@ -301,8 +301,8 @@ export async function fetchWeekendEvents(filters: EventFilters = {}) {
   if (filters.locationArea && filters.locationArea.length > 0) {
     query = query.in("location_area", filters.locationArea);
   }
-  if (!filters.includeFaith) {
-    query = query.or("audience_openness.is.null,audience_openness.eq.open_to_all");
+  if (filters.includeFaith) {
+    query = query.eq("audience_openness", "faith_community");
   }
 
   const { data, error } = await query;
