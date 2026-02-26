@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/classes", label: "Classes & Sign-Ups" },
   { href: "/places", label: "Places" },
   { href: "/newsletter", label: "Newsletter" },
+  { href: "/behind-the-scenes", label: "Behind the Scenes" },
   { href: "/about", label: "About" },
 ];
 
