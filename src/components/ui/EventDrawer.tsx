@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import EventDrawerCard from "@/components/ui/EventDrawerCard";
 import { groupEventsByType, getEventTypeLabel, getEventTypeIcon } from "@/lib/event-helpers";
 import type { BaltimoreEvent } from "@/lib/supabase";
@@ -22,8 +22,6 @@ function formatDrawerDate(dateStr: string): string {
   });
 }
 
-const INITIAL_PER_CATEGORY = 3;
-
 export default function EventDrawer({
   isOpen,
   selectedDate,
@@ -32,12 +30,6 @@ export default function EventDrawer({
 }: EventDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
-
-  // Reset expanded categories when date changes
-  useEffect(() => {
-    setExpandedCategories(new Set());
-  }, [selectedDate]);
 
   // Escape key handler
   const handleKeyDown = useCallback(
@@ -76,18 +68,6 @@ export default function EventDrawer({
   const eventCount = events.length;
   const useGroupedView = eventCount >= 10;
 
-  const toggleCategory = (category: string) => {
-    setExpandedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) {
-        next.delete(category);
-      } else {
-        next.add(category);
-      }
-      return next;
-    });
-  };
-
   // Render grouped view
   const renderGroupedEvents = () => {
     const grouped = groupEventsByType(events);
@@ -97,55 +77,29 @@ export default function EventDrawer({
 
     return (
       <div className="space-y-5">
-        {sortedCategories.map(([category, categoryEvents]) => {
-          const isExpanded = expandedCategories.has(category);
-          const visibleEvents = isExpanded
-            ? categoryEvents
-            : categoryEvents.slice(0, INITIAL_PER_CATEGORY);
-          const hiddenCount = categoryEvents.length - INITIAL_PER_CATEGORY;
-
-          return (
-            <div key={category}>
-              {/* Category header */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg" aria-hidden="true">
-                  {getEventTypeIcon(category)}
-                </span>
-                <h4 className="font-display text-sm font-semibold text-[var(--color-boh)]">
-                  {getEventTypeLabel(category)}
-                </h4>
-                <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-crab)]/10 text-[var(--color-crab)]">
-                  {categoryEvents.length}
-                </span>
-              </div>
-
-              {/* Events in category */}
-              <div className="space-y-2">
-                {visibleEvents.map((event) => (
-                  <EventDrawerCard key={event.id} event={event} />
-                ))}
-              </div>
-
-              {/* Show more button */}
-              {hiddenCount > 0 && !isExpanded && (
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="mt-2 text-sm text-[var(--color-charm)] font-medium hover:text-[var(--color-crab)] transition-colors"
-                >
-                  Show {hiddenCount} more
-                </button>
-              )}
-              {isExpanded && hiddenCount > 0 && (
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="mt-2 text-sm text-[var(--color-charm)] font-medium hover:text-[var(--color-crab)] transition-colors"
-                >
-                  Show less
-                </button>
-              )}
+        {sortedCategories.map(([category, categoryEvents]) => (
+          <div key={category}>
+            {/* Category header */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg" aria-hidden="true">
+                {getEventTypeIcon(category)}
+              </span>
+              <h4 className="font-display text-sm font-semibold text-[var(--color-boh)]">
+                {getEventTypeLabel(category)}
+              </h4>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-crab)]/10 text-[var(--color-crab)]">
+                {categoryEvents.length}
+              </span>
             </div>
-          );
-        })}
+
+            {/* Events in category */}
+            <div className="space-y-2">
+              {categoryEvents.map((event) => (
+                <EventDrawerCard key={event.id} event={event} />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     );
   };

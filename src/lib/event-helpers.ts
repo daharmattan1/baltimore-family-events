@@ -266,12 +266,12 @@ export function deduplicateEvents(
 }
 
 // Group events by date (YYYY-MM-DD key)
+// Note: expects already-deduplicated events (API layer handles dedup)
 export function groupEventsByDate(
   events: BaltimoreEvent[]
 ): Map<string, BaltimoreEvent[]> {
-  const deduplicated = deduplicateEvents(events);
   const grouped = new Map<string, BaltimoreEvent[]>();
-  for (const event of deduplicated) {
+  for (const event of events) {
     const dateKey = event.event_date_start
       ? event.event_date_start.split("T")[0]
       : "unknown";
