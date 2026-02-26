@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BaltimoreEvent } from "@/lib/supabase";
+import { getEventLinkUrl } from "@/lib/event-helpers";
 
 // Get event type icon
 function getEventTypeIcon(eventType?: string): string {
@@ -132,7 +133,7 @@ export default function FeaturedEvents() {
           {events.map((event) => (
             <a
               key={event.id}
-              href={event.original_event_url || event.registration_url || event.source_url || "#"}
+              href={getEventLinkUrl(event) || "#"}
               target="_blank"
               rel="noopener noreferrer"
               className="group block bg-white border border-[var(--muted)]/20 rounded-xl p-5 transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover no-underline cursor-pointer"

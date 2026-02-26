@@ -1,5 +1,49 @@
 import { BaltimoreEvent } from "@/lib/supabase";
 
+// --- Aggregator URL Filter ---
+// NEVER link to aggregator calendar pages. BmoreFamilies curates original sources.
+const BLOCKED_DOMAINS = [
+  "macaronikid.com",
+  "baltimoreschild.com",
+  "inoreader.com",
+];
+
+function isBlockedUrl(url: string | null | undefined): boolean {
+  if (!url) return true;
+  return BLOCKED_DOMAINS.some((domain) => url.includes(domain));
+}
+
+/**
+ * Get the best available link URL for an event, filtering out aggregator URLs.
+ * Returns null if no clean URL is available (rather than showing an aggregator link).
+ */
+export function getEventLinkUrl(event: BaltimoreEvent): string | null {
+  const candidates = [
+    event.original_event_url,
+    event.registration_url,
+    event.source_url,
+  ];
+  for (const url of candidates) {
+    if (url && !isBlockedUrl(url)) return url;
+  }
+  return null;
+}
+
+/**
+ * Same as getEventLinkUrl but prioritizes registration_url (for classes/programs).
+ */
+export function getClassLinkUrl(event: BaltimoreEvent): string | null {
+  const candidates = [
+    event.registration_url,
+    event.original_event_url,
+    event.source_url,
+  ];
+  for (const url of candidates) {
+    if (url && !isBlockedUrl(url)) return url;
+  }
+  return null;
+}
+
 // Parse a YYYY-MM-DD string into year/month/day without timezone shifting.
 // new Date("2026-03-01") interprets as UTC midnight, which in US timezones
 // shifts back to the previous day. This helper avoids that entirely.
@@ -189,6 +233,79 @@ function normalizeTitle(title: string): string {
     .trim();
 }
 
+// Normalize venue/title text for keying and comparison.
+// Includes light abbreviation expansion to catch common venue variants.
+function normalizeDedupText(value: string): string {
+  return normalizeTitle(value)
+    .replace(/\bctr\b/g, "center")
+    .replace(/\bst\b/g, "street")
+    .replace(/\bave\b/g, "avenue")
+    .replace(/\bblvd\b/g, "boulevard")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dateKeyForEvent(event: BaltimoreEvent): string {
+  return event.event_date_start
+    ? event.event_date_start.split("T")[0]
+    : "no_date";
+}
+
+function dedupPrimaryKey(event: BaltimoreEvent): string | null {
+  const dateKey = dateKeyForEvent(event);
+  const coalesced = normalizeDedupText(event.venue || event.title || "");
+  if (!coalesced) return null;
+  return `${coalesced}|${dateKey}`;
+}
+
+function qualityScore(event: BaltimoreEvent): number {
+  const familyScore = event.family_friendly_score ?? 0;
+  const featuredBoost = event.featured_worthy ? 1 : 0;
+  const linkBoost =
+    (event.registration_url ? 1 : 0) +
+    (event.original_event_url ? 1 : 0) +
+    (event.source_url ? 1 : 0);
+  const summaryLen = (event.summary || "").length;
+  const contentLen = (event.content || "").length;
+  const detailBoost = Math.min(summaryLen + contentLen, 1000) / 1000;
+  return familyScore * 10 + featuredBoost + linkBoost * 0.25 + detailBoost;
+}
+
+function chooseSurvivor(a: BaltimoreEvent, b: BaltimoreEvent): BaltimoreEvent {
+  const aScore = qualityScore(a);
+  const bScore = qualityScore(b);
+  if (aScore === bScore) {
+    return (b.title || "").length > (a.title || "").length ? b : a;
+  }
+  return bScore > aScore ? b : a;
+}
+
+function collapsePrimaryBucket(events: BaltimoreEvent[]): BaltimoreEvent[] {
+  if (events.length <= 1) return events;
+
+  const survivors: BaltimoreEvent[] = [];
+  const sorted = [...events].sort((a, b) => qualityScore(b) - qualityScore(a));
+
+  for (const event of sorted) {
+    const duplicateIdx = survivors.findIndex((existing) =>
+      titlesAreSimilar(
+        event.title || "",
+        existing.title || "",
+        event.venue || existing.venue || ""
+      )
+    );
+
+    if (duplicateIdx === -1) {
+      survivors.push(event);
+      continue;
+    }
+
+    survivors[duplicateIdx] = chooseSurvivor(survivors[duplicateIdx], event);
+  }
+
+  return survivors;
+}
+
 // Strip venue name from a title to avoid inflated word counts.
 // Many titles embed the venue name (e.g., "Walters Art Museum Drop-in Art Making").
 function stripVenueName(title: string, venue: string): string {
@@ -197,7 +314,7 @@ function stripVenueName(title: string, venue: string): string {
   const normalizedTitle = normalizeTitle(title);
   // Remove the venue name (and common prefixes like "the") from the title
   const venueWithoutThe = normalizedVenue.replace(/^the\s+/, "");
-  let stripped = normalizedTitle
+  const stripped = normalizedTitle
     .replace(normalizedVenue, "")
     .replace(venueWithoutThe, "")
     .replace(/\s+/g, " ")
@@ -244,64 +361,59 @@ function titlesAreSimilar(a: string, b: string, venue?: string): boolean {
 export function deduplicateEvents(
   events: BaltimoreEvent[]
 ): BaltimoreEvent[] {
-  // Pass 1: exact title + date dedup
-  const seen = new Map<string, BaltimoreEvent>();
+  // Pass 1: deterministic survivor selection by COALESCE(venue, title) + date.
+  // Within each key bucket, keep only near-identical title variants.
+  const primaryBuckets = new Map<string, BaltimoreEvent[]>();
+  const passthrough: BaltimoreEvent[] = [];
   for (const event of events) {
-    const normalizedTitle = (event.title || "")
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, " ");
-    const dateKey = event.event_date_start
-      ? event.event_date_start.split("T")[0]
-      : "no_date";
-    const dedupKey = `${normalizedTitle}|${dateKey}`;
-    const existing = seen.get(dedupKey);
-    if (
-      !existing ||
-      (event.family_friendly_score ?? 0) >
-        (existing.family_friendly_score ?? 0)
-    ) {
-      seen.set(dedupKey, event);
-    }
-  }
-  const afterExact = Array.from(seen.values());
-
-  // Pass 2: fuzzy dedup — same venue + same date + similar title
-  const result: BaltimoreEvent[] = [];
-  for (const event of afterExact) {
-    const dateKey = event.event_date_start
-      ? event.event_date_start.split("T")[0]
-      : "no_date";
-    const venue = (event.venue || "").toLowerCase().trim();
-
-    // Skip fuzzy matching if no venue (can't confidently dedup without it)
-    if (!venue) {
-      result.push(event);
+    const key = dedupPrimaryKey(event);
+    if (!key) {
+      passthrough.push(event);
       continue;
     }
 
+    const existing = primaryBuckets.get(key) || [];
+    existing.push(event);
+    primaryBuckets.set(key, existing);
+  }
+
+  const afterPrimary: BaltimoreEvent[] = [...passthrough];
+  for (const bucket of primaryBuckets.values()) {
+    afterPrimary.push(...collapsePrimaryBucket(bucket));
+  }
+
+  // Pass 2: fuzzy cleanup for remaining near-duplicates on the same date.
+  // Handles venue spelling variants and records missing venue fields.
+  const result: BaltimoreEvent[] = [];
+  for (const event of afterPrimary) {
+    const dateKey = dateKeyForEvent(event);
+    const venue = normalizeDedupText(event.venue || "");
+
     const duplicate = result.find((existing) => {
-      const existingDate = existing.event_date_start
-        ? existing.event_date_start.split("T")[0]
-        : "no_date";
-      const existingVenue = (existing.venue || "").toLowerCase().trim();
+      const existingDate = dateKeyForEvent(existing);
+      if (dateKey !== existingDate) return false;
+
+      const existingVenue = normalizeDedupText(existing.venue || "");
+      const sameVenue = Boolean(venue && existingVenue && venue === existingVenue);
+      const titleSimilar = titlesAreSimilar(
+        event.title || "",
+        existing.title || "",
+        event.venue || existing.venue || ""
+      );
+      const venueMissingOnEitherSide = !venue || !existingVenue;
+
       return (
-        dateKey === existingDate &&
-        venue === existingVenue &&
-        titlesAreSimilar(event.title || "", existing.title || "", event.venue || "")
+        sameVenue ||
+        (titleSimilar && venueMissingOnEitherSide)
       );
     });
 
     if (duplicate) {
-      // Keep the one with the higher score
-      if (
-        (event.family_friendly_score ?? 0) >
-        (duplicate.family_friendly_score ?? 0)
-      ) {
+      const survivor = chooseSurvivor(duplicate, event);
+      if (survivor !== duplicate) {
         const idx = result.indexOf(duplicate);
-        result[idx] = event;
+        result[idx] = survivor;
       }
-      // Otherwise skip this event (duplicate with lower score)
     } else {
       result.push(event);
     }
@@ -403,8 +515,9 @@ export function generateEventJsonLd(events: BaltimoreEvent[]) {
         jsonLd.image = event.image_url;
       }
 
-      if (event.source_url || event.original_event_url) {
-        jsonLd.url = event.original_event_url || event.source_url;
+      const eventUrl = getEventLinkUrl(event);
+      if (eventUrl) {
+        jsonLd.url = eventUrl;
       }
 
       return jsonLd;

@@ -11,6 +11,7 @@ import {
   getVenueSourceBadgeLabel,
   getVenueSourceBadgeColor,
   getAudienceBadgeLabel,
+  getEventLinkUrl,
 } from "@/lib/event-helpers";
 
 interface EventCardProps {
@@ -18,7 +19,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
-  const linkUrl = event.original_event_url || event.registration_url || event.source_url;
+  const linkUrl = getEventLinkUrl(event);
 
   return (
     <div className={`card group relative bg-white border border-[var(--muted)]/20 rounded-xl p-5 border-l-4 ${getCategoryBorderColor(event.event_type)} transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover`}>

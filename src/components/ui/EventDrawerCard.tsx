@@ -7,6 +7,7 @@ import {
   getVenueSourceBadgeLabel,
   getVenueSourceBadgeColor,
   getAudienceBadgeLabel,
+  getEventLinkUrl,
 } from "@/lib/event-helpers";
 
 interface EventDrawerCardProps {
@@ -14,7 +15,7 @@ interface EventDrawerCardProps {
 }
 
 export default function EventDrawerCard({ event }: EventDrawerCardProps) {
-  const linkUrl = event.original_event_url || event.registration_url || event.source_url;
+  const linkUrl = getEventLinkUrl(event);
 
   return (
     <div

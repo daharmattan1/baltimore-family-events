@@ -3,6 +3,7 @@ import {
   formatDate,
   getCostBadgeClass,
   getAgeLabel,
+  getClassLinkUrl,
 } from "@/lib/event-helpers";
 
 interface ClassCardProps {
@@ -10,7 +11,7 @@ interface ClassCardProps {
 }
 
 export default function ClassCard({ event }: ClassCardProps) {
-  const linkUrl = event.registration_url || event.original_event_url || event.source_url;
+  const linkUrl = getClassLinkUrl(event);
 
   return (
     <div className="card group relative bg-white border border-[var(--muted)]/20 rounded-xl p-5 border-l-4 border-l-[var(--color-agent-toddler)] transition-all duration-drift hover:-translate-y-1 hover:shadow-card-hover">

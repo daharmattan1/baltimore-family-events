@@ -6,6 +6,7 @@ import {
   getEventTypeIcon,
   getCostBadgeClass,
   getAgeLabel,
+  getEventLinkUrl,
 } from "@/lib/event-helpers";
 
 interface VenueGroupRowProps {
@@ -19,8 +20,7 @@ export default function VenueGroupRow({
   venueName,
   groupEventCount,
 }: VenueGroupRowProps) {
-  const linkUrl =
-    event.original_event_url || event.registration_url || event.source_url;
+  const linkUrl = getEventLinkUrl(event);
 
   return (
     <div className="flex items-center gap-2 py-2 px-1 text-sm border-b border-[var(--muted)]/10 last:border-b-0">
